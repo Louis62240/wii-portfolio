@@ -1,0 +1,631 @@
+/* ============================================================
+   Menu Wii — feuille de style
+   Aucune dépendance, aucune police externe.
+   ============================================================ */
+
+:root{
+  /* Châssis */
+  --bg-top:      #fbfdfe;
+  --bg-mid:      #eef4f7;
+  --bg-bot:      #dae6ec;
+  --frame:       #dfe6ea;
+  --frame-edge:  #c2ccd3;
+  --frame-in:    #b9c4cb;
+  --ink:         #66757e;
+  --ink-soft:    #96a4ac;
+
+  /* Bleu Wii */
+  --wii:         #23b6ee;
+  --wii-soft:    #8ddcf7;
+  --wii-pale:    #e9f7fd;
+
+  /* Métriques */
+  --dock-h: clamp(132px, 19dvh, 176px);
+  --gap:    clamp(8px, 1.1vw, 17px);
+  --label:  clamp(15px, 1.9vh, 21px);
+  --radius: clamp(9px, 1.1vw, 15px);
+
+  /* Largeur d'une chaîne : la plus petite contrainte entre
+     la place horizontale et la place verticale disponibles. */
+  --grid-w:  min(1060px, 88vw);
+  /* 70px = padding du stage + hauteur des pastilles de page */
+  --stage-h: calc(100dvh - var(--dock-h) - 70px);
+  --tile: min(
+    calc((var(--grid-w) - 3 * var(--gap)) / 4),
+    calc((var(--stage-h) - 2 * var(--gap) - 3 * var(--label)) / 3 * 4 / 3)
+  );
+
+  font-family: "Trebuchet MS", "Segoe UI", Tahoma, Verdana, sans-serif;
+}
+
+*,
+*::before,
+*::after{ box-sizing: border-box; }
+
+html, body{ height: 100%; }
+
+body{
+  margin: 0;
+  color: var(--ink);
+  background: var(--bg-mid);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Curseur Wiimote actif : on masque le pointeur système */
+body.pointer-wii,
+body.pointer-wii *{ cursor: none !important; }
+
+.screen{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background:
+    radial-gradient(120% 80% at 50% 0%, #ffffff 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 55%, var(--bg-bot) 100%);
+}
+
+/* Fine trame horizontale caractéristique du menu */
+.screen::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,.55) 0px,
+    rgba(255,255,255,.55) 1px,
+    rgba(150,170,180,.05) 1px,
+    rgba(150,170,180,.05) 3px
+  );
+  opacity: .7;
+}
+
+/* ============================================================
+   Zone haute : grille des chaînes
+   ============================================================ */
+
+.stage{
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 0 6px;
+}
+
+.stage-inner{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 1.4vw, 22px);
+  width: 100%;
+}
+
+.grid-wrap{
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.grid{
+  display: grid;
+  grid-template-columns: repeat(4, var(--tile));
+  gap: var(--gap);
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+.grid.is-turning{ opacity: 0; }
+.grid.turn-left{  transform: translateX(-26px); }
+.grid.turn-right{ transform: translateX(26px); }
+
+.cell{ min-width: 0; }
+
+/* ---- Une chaîne ---- */
+
+.chan{
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.chan-face{
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+  background: var(--frame);
+  padding: clamp(3px, .45vw, 6px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -1px 0 rgba(0,0,0,.06),
+    0 0 0 1px var(--frame-edge),
+    0 2px 5px rgba(80,105,120,.16);
+  transition: transform .16s cubic-bezier(.2,.9,.3,1.2),
+              box-shadow .16s ease;
+}
+
+.chan-art{
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--radius) - 5px);
+  background-color: var(--c, #8fa3ad); /* repli si color-mix() absent */
+  background-image: linear-gradient(155deg,
+      color-mix(in srgb, var(--c, #8fa3ad) 78%, white 22%) 0%,
+      var(--c, #8fa3ad) 55%,
+      color-mix(in srgb, var(--c, #8fa3ad) 74%, black 26%) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.14);
+}
+
+.chan-art img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.chan-art.no-image img{ display: none; }
+
+/* Reflet vitré par-dessus la vignette */
+.chan-art::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.42) 0%,
+    rgba(255,255,255,.10) 42%,
+    rgba(255,255,255,0)   58%,
+    rgba(0,0,0,.10)      100%);
+}
+
+.chan-fallback{
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .25em;
+  padding: 8%;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+
+.chan-art.no-image .chan-fallback{ display: flex; }
+
+.chan-fallback b{
+  font-size: clamp(12px, calc(var(--tile) * .125), 26px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: .01em;
+}
+
+.chan-fallback i{
+  font-style: normal;
+  font-size: clamp(9px, calc(var(--tile) * .072), 15px);
+  opacity: .85;
+}
+
+.chan-label{
+  display: block;
+  height: var(--label);
+  line-height: var(--label);
+  padding: 0 2px;
+  font-size: clamp(10px, calc(var(--tile) * .085), 15px);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Survol / focus */
+.chan:hover  .chan-face,
+.chan:focus-visible .chan-face{
+  transform: translateY(-3px) scale(1.045);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    0 0 0 1px var(--wii-soft),
+    0 0 0 4px rgba(35,182,238,.22),
+    0 8px 18px rgba(40,110,145,.24);
+}
+
+.chan:focus{ outline: none; }
+
+.chan:focus-visible .chan-face{
+  outline: 2px solid var(--wii);
+  outline-offset: 4px;
+}
+
+.chan:active .chan-face{
+  transform: translateY(-1px) scale(.99);
+}
+
+/* ---- Emplacement vide ---- */
+
+.cell--empty .chan-face{
+  background: linear-gradient(180deg, #eaeff2, #dde5e9);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 0 0 1px #cdd6dc,
+    0 1px 3px rgba(90,115,130,.10);
+}
+
+.slot-face{
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--radius) - 5px);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.75) 0 1px, rgba(0,0,0,0) 1px 5px),
+    repeating-linear-gradient(0deg,  rgba(255,255,255,.75) 0 1px, rgba(0,0,0,0) 1px 5px),
+    linear-gradient(180deg, #e3eaee, #d6dfe4);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slot-face .wii-mark{
+  font-weight: 700;
+  font-size: clamp(11px, calc(var(--tile) * .17), 30px);
+  letter-spacing: .02em;
+  color: rgba(255,255,255,.9);
+  text-shadow: 0 1px 0 rgba(150,168,178,.55);
+}
+
+/* La place reste réservée pour que toutes les cases gardent la même
+   hauteur, qu'elles aient une bannière ou non. */
+.chan.has-banner .chan-label{ visibility: hidden; }
+
+.cell--empty .chan{ pointer-events: none; }
+.cell--empty .chan-label{ visibility: hidden; }
+
+/* ---- Flèches de pagination ---- */
+
+.pager{
+  flex: 0 0 auto;
+  width: clamp(26px, 3.4vw, 44px);
+  height: clamp(72px, 13vh, 132px);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: var(--wii);
+  background: linear-gradient(180deg, #ffffff, #e8f3f8);
+  box-shadow:
+    0 0 0 1px #c9d8e0,
+    inset 0 1px 0 #fff,
+    0 2px 6px rgba(70,105,125,.16);
+  transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease;
+}
+
+.pager svg{ width: 45%; height: auto; }
+
+.pager:hover:not(:disabled){
+  transform: scale(1.07);
+  box-shadow:
+    0 0 0 1px var(--wii-soft),
+    0 0 0 4px rgba(35,182,238,.18),
+    0 4px 10px rgba(40,110,145,.2);
+}
+
+.pager:active:not(:disabled){ transform: scale(.97); }
+
+.pager:disabled{
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pager[hidden]{ display: none; }
+
+/* ---- Pastilles de page ---- */
+
+.dots{
+  display: flex;
+  gap: 7px;
+  height: 18px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.dots span{
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c6d2d9;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+  transition: background .18s ease, transform .18s ease;
+}
+
+.dots span.on{
+  background: var(--wii);
+  transform: scale(1.25);
+}
+
+/* ============================================================
+   Barre basse
+   ============================================================ */
+
+.dock{
+  position: relative;
+  z-index: 2;
+  flex: 0 0 var(--dock-h);
+  height: var(--dock-h);
+}
+
+/* L'arc bleu : un très large bloc au rayon elliptique énorme */
+.dock-curve{
+  position: absolute;
+  left: -14%;
+  right: -14%;
+  top: 0;
+  bottom: -40px;
+  border-radius: 50% 50% 0 0 / clamp(34px, 6vh, 62px) clamp(34px, 6vh, 62px) 0 0;
+  background: linear-gradient(180deg, #f2fbfe 0%, var(--wii-pale) 38%, #d3ecf8 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255,255,255,.9),
+    0 -1px 14px rgba(30,140,185,.10);
+  border-top: 2px solid var(--wii-soft);
+}
+
+.dock-content{
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 clamp(14px, 3.5vw, 60px);
+}
+
+/* Horloge */
+
+/* Tous les éléments de la barre partagent la ligne 1. Sans `grid-row`
+   explicite, l'auto-placement renvoie les suivants sur une 2e ligne. */
+.clock{
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+  line-height: 1;
+  padding-bottom: 4px;
+}
+
+.clock-time{
+  font-size: clamp(30px, 5.6vh, 54px);
+  font-weight: 400;
+  letter-spacing: .02em;
+  color: #5f6f78;
+  text-shadow: 0 1px 0 rgba(255,255,255,.9);
+}
+
+.clock-time .ampm{
+  font-size: .42em;
+  margin-left: .25em;
+  color: var(--ink-soft);
+}
+
+.clock-date{
+  margin-top: clamp(4px, 1vh, 10px);
+  font-size: clamp(13px, 2.2vh, 21px);
+  color: #7b8992;
+  text-shadow: 0 1px 0 rgba(255,255,255,.85);
+}
+
+.clock-owner{
+  margin-top: clamp(5px, 1.1vh, 11px);
+  font-size: clamp(10px, 1.5vh, 14px);
+  letter-spacing: .04em;
+  white-space: nowrap;
+  color: #93a2ab;
+  text-shadow: 0 1px 0 rgba(255,255,255,.8);
+}
+
+/* Boutons ronds */
+
+.round-btn{
+  --size: clamp(52px, 9.2vh, 86px);
+  width: var(--size);
+  height: var(--size);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--ink);
+  background: linear-gradient(180deg, #ffffff 0%, #f0f6f9 52%, #dceaf1 100%);
+  box-shadow:
+    0 0 0 1px #c4d2da,
+    inset 0 2px 0 rgba(255,255,255,.95),
+    inset 0 -3px 6px rgba(120,150,165,.16),
+    0 3px 8px rgba(50,95,120,.18);
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+
+.round-btn--left{  grid-column: 1; grid-row: 1; justify-self: start; }
+.round-btn--right{ grid-column: 3; grid-row: 1; justify-self: end; }
+
+.round-btn:hover{
+  transform: scale(1.06);
+  box-shadow:
+    0 0 0 1px var(--wii-soft),
+    0 0 0 5px rgba(35,182,238,.18),
+    inset 0 2px 0 rgba(255,255,255,.95),
+    0 5px 12px rgba(50,95,120,.22);
+}
+
+.round-btn:active{ transform: scale(.96); }
+
+.round-btn:focus{ outline: none; }
+.round-btn:focus-visible{ outline: 2px solid var(--wii); outline-offset: 4px; }
+
+.logo-wii{
+  font-size: calc(var(--size) * .34);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: #7c8b94;
+  text-shadow: 0 1px 0 rgba(255,255,255,.9);
+}
+
+.round-btn svg{
+  width: 46%;
+  height: 46%;
+  color: #7c8b94;
+}
+
+.ico-sound-off{ display: none; }
+
+.round-btn.is-muted .ico-sound-on{  display: none; }
+.round-btn.is-muted .ico-sound-off{ display: block; }
+.round-btn.is-muted svg{ color: #a9b6bd; }
+
+/* Le petit volet type lecteur de carte, à gauche de l'horloge */
+.slot{
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  width: clamp(20px, 2.6vw, 32px);
+  height: clamp(26px, 3.4vw, 40px);
+  margin-right: clamp(8px, 2.5vw, 34px);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #eef4f7, #dbe5ea);
+  box-shadow: 0 0 0 1px #c8d4db, inset 0 1px 0 #fff;
+  display: grid;
+  place-items: center;
+}
+
+.slot span{
+  width: 58%;
+  height: 3px;
+  border-radius: 2px;
+  background: #c3cfd6;
+}
+
+/* ============================================================
+   Transition d'ouverture
+   ============================================================ */
+
+.zoom-layer{
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.zoom-layer .flyer{
+  position: fixed;
+  margin: 0;
+  transform-origin: center center;
+  will-change: transform, border-radius;
+  transition:
+    transform .52s cubic-bezier(.55,0,.35,1),
+    border-radius .52s ease,
+    box-shadow .52s ease;
+}
+
+.flash{
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .26s ease;
+}
+
+.flash.on{ opacity: 1; }
+
+/* ============================================================
+   Curseur Wiimote
+   ============================================================ */
+
+.wii-pointer{
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: clamp(34px, 2.9vw, 46px);
+  pointer-events: none;
+  will-change: transform;
+  /* La main pivote autour du bout de l'index, qui reste collé
+     au point visé — comme la vraie Wiimote. */
+  transform-origin: 35% 2%;
+  transform: translate3d(-999px, -999px, 0);
+  filter: drop-shadow(0 3px 5px rgba(40,80,100,.3));
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+
+.wii-pointer.on{ opacity: 1; }
+
+.wii-pointer img{
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Pixel art : surtout pas de lissage à l'agrandissement. */
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+/* ============================================================
+   Adaptations
+   ============================================================ */
+
+@media (max-width: 760px){
+  :root{
+    --grid-w: 94vw;
+    --tile: min(
+      calc((94vw - 2 * var(--gap)) / 3),
+      calc((var(--stage-h) - 3 * var(--gap) - 4 * var(--label)) / 4 * 4 / 3)
+    );
+  }
+  .grid{ grid-template-columns: repeat(3, var(--tile)); }
+  .slot{ display: none; }
+}
+
+@media (max-width: 460px){
+  :root{
+    --tile: min(
+      calc((94vw - var(--gap)) / 2),
+      calc((var(--stage-h) - 3 * var(--gap) - 4 * var(--label)) / 4 * 4 / 3)
+    );
+  }
+  .grid{ grid-template-columns: repeat(2, var(--tile)); }
+}
+
+/* Écran tactile : pas de curseur Wiimote */
+@media (hover: none){
+  .wii-pointer{ display: none; }
+  body.pointer-wii,
+  body.pointer-wii *{ cursor: auto !important; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,
+  *::before,
+  *::after{
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portfolio de Louis Hanquiez</title>
+<meta name="description" content="Menu de mes projets.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23eef2f4'/><rect x='6' y='8' width='8' height='6' rx='2' fill='%2300a8e8'/><rect x='18' y='8' width='8' height='6' rx='2' fill='%23c6d2d8'/><rect x='6' y='18' width='8' height='6' rx='2' fill='%23c6d2d8'/><rect x='18' y='18' width='8' height='6' rx='2' fill='%23c6d2d8'/></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="screen">
+
+  <!-- ======== Zone haute : grille des chaînes ======== -->
+  <main class="stage" role="main">
+    <div class="stage-inner">
+
+      <button class="pager pager--prev" type="button" aria-label="Page précédente" disabled>
+        <svg viewBox="0 0 24 40" aria-hidden="true"><path d="M17 3 5 20l12 17" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <div class="grid-wrap">
+        <ul class="grid" id="grid" aria-label="Mes projets"></ul>
+      </div>
+
+      <button class="pager pager--next" type="button" aria-label="Page suivante">
+        <svg viewBox="0 0 24 40" aria-hidden="true"><path d="M7 3l12 17L7 37" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="dots" id="dots" aria-hidden="true"></div>
+  </main>
+
+  <!-- ======== Barre basse ======== -->
+  <footer class="dock">
+    <div class="dock-curve"></div>
+
+    <div class="dock-content">
+      <button class="round-btn round-btn--left" type="button" id="btnHome" aria-label="Accueil">
+        <span class="logo-wii">Wii</span>
+      </button>
+
+      <div class="slot" aria-hidden="true"><span></span></div>
+
+      <div class="clock">
+        <div class="clock-time" id="clockTime">--:--</div>
+        <div class="clock-date" id="clockDate">&nbsp;</div>
+        <div class="clock-owner">Portfolio de Louis Hanquiez</div>
+      </div>
+
+      <button class="round-btn round-btn--right" type="button" id="btnSound" aria-label="Couper le son" aria-pressed="false">
+        <svg class="ico-sound-on" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z" fill="currentColor"/>
+          <path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <svg class="ico-sound-off" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z" fill="currentColor"/>
+          <path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Transition d'ouverture d'une chaîne -->
+  <div class="zoom-layer" id="zoomLayer" aria-hidden="true"></div>
+  <div class="flash" id="flash" aria-hidden="true"></div>
+</div>
+
+<script src="js/projects.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
