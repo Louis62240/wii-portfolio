@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kit — composants partagés</title>
+<meta name="description" content="Catalogue des composants communs aux pages de louishanquiez.fr.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/kit/kit.css">
+<style>
+  /* Propre à cette page de catalogue, ne fait pas partie du kit. */
+  .demo-section{ margin-bottom: clamp(30px, 5vh, 56px); }
+  .demo-section > h2{
+    margin: 0 0 .2em;
+    font-size: clamp(17px, 2vw, 23px);
+    color: var(--k-ink-strong);
+  }
+  .demo-note{
+    margin: 0 0 1.1em;
+    font-size: 14px;
+    color: var(--k-ink-soft);
+  }
+  .demo-row{ display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  code{
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: .92em;
+    padding: .12em .45em;
+    border-radius: 5px;
+    background: var(--k-blue-pale);
+    color: #40788e;
+  }
+</style>
+</head>
+<body>
+
+<div class="k-screen">
+
+  <header class="k-header">
+    <h1 class="k-title">Kit</h1>
+    <p class="k-lede">
+      Les briques communes à toutes mes pages. Une page les récupère avec
+      <code>&lt;link rel="stylesheet" href="/kit/kit.css"&gt;</code> et n'a plus
+      qu'à écrire son contenu.
+    </p>
+  </header>
+
+  <main class="k-main">
+
+    <section class="demo-section">
+      <h2>Mise en page</h2>
+      <p class="demo-note">
+        L'ossature que partagent les pages : <code>.k-screen</code> pour le fond,
+        puis <code>.k-header</code>, <code>.k-main</code> et <code>.k-footer</code>.
+        Cette page en est elle-même un exemple.
+      </p>
+    </section>
+
+    <section class="demo-section">
+      <h2>Barre de filtres</h2>
+      <p class="demo-note">La ligne de contrôles qui ouvre une page de résultats.</p>
+
+      <div class="k-bar">
+        <label class="k-field">
+          <span class="k-label">Départ</span>
+          <input class="k-input" type="text" value="Paris" size="12">
+        </label>
+
+        <label class="k-field">
+          <span class="k-label">Quand</span>
+          <select class="k-select">
+            <option>Ce week-end</option>
+            <option>Les 7 prochains jours</option>
+            <option>Ce mois-ci</option>
+          </select>
+        </label>
+
+        <span class="k-bar__spacer"></span>
+        <button class="k-btn" type="button">Réinitialiser</button>
+        <button class="k-btn k-btn--primary" type="button">Rechercher</button>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Boutons et puces</h2>
+      <div class="demo-row" style="margin-bottom:14px">
+        <button class="k-btn k-btn--primary" type="button">Action principale</button>
+        <button class="k-btn" type="button">Action secondaire</button>
+        <button class="k-btn" type="button" disabled>Indisponible</button>
+      </div>
+      <ul class="k-chips">
+        <li class="k-chip">Neutre</li>
+        <li class="k-chip k-chip--good">0 €</li>
+        <li class="k-chip k-chip--warn">Peu de places</li>
+        <li class="k-chip k-chip--bad">Complet</li>
+      </ul>
+    </section>
+
+    <section class="demo-section">
+      <h2>Tableau de résultats</h2>
+      <p class="demo-note">
+        Pour les listes denses. Le tableau défile dans sa boîte, jamais la page.
+      </p>
+
+      <div class="k-table-wrap">
+        <table class="k-table">
+          <thead>
+            <tr>
+              <th scope="col">Train</th>
+              <th scope="col">Trajet</th>
+              <th scope="col">Départ</th>
+              <th scope="col">Durée</th>
+              <th scope="col" class="k-table__num">Prix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TGV 8412</td>
+              <td>Paris → Bordeaux</td>
+              <td>sam. 07:14</td>
+              <td>2 h 04</td>
+              <td class="k-table__num">0 €</td>
+            </tr>
+            <tr>
+              <td>TGV 6178</td>
+              <td>Paris → Lyon</td>
+              <td>sam. 09:42</td>
+              <td>1 h 57</td>
+              <td class="k-table__num">0 €</td>
+            </tr>
+            <tr>
+              <td>TGV 5230</td>
+              <td>Paris → Marseille</td>
+              <td>dim. 16:08</td>
+              <td>3 h 11</td>
+              <td class="k-table__num">0 €</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Cartes</h2>
+      <p class="demo-note">Pour les listes aérées — les activités, par exemple.</p>
+
+      <div class="k-grid">
+        <article class="k-card">
+          <h3 class="k-card__title">Nuit des musées</h3>
+          <ul class="k-chips" style="margin-bottom:.7em">
+            <li class="k-chip k-chip--good">Gratuit</li>
+            <li class="k-chip">Samedi</li>
+          </ul>
+          <p style="margin:0;font-size:14px;line-height:1.55">
+            Ouverture exceptionnelle en soirée, sans réservation.
+          </p>
+        </article>
+
+        <article class="k-card">
+          <h3 class="k-card__title">Concert au parc</h3>
+          <ul class="k-chips" style="margin-bottom:.7em">
+            <li class="k-chip k-chip--good">Gratuit</li>
+            <li class="k-chip">Dimanche</li>
+          </ul>
+          <p style="margin:0;font-size:14px;line-height:1.55">
+            En plein air, annulé en cas de pluie.
+          </p>
+        </article>
+
+        <article class="k-card">
+          <h3 class="k-card__title">Visite guidée</h3>
+          <ul class="k-chips" style="margin-bottom:.7em">
+            <li class="k-chip k-chip--warn">Sur inscription</li>
+            <li class="k-chip">Samedi</li>
+          </ul>
+          <p style="margin:0;font-size:14px;line-height:1.55">
+            Places limitées, inscription le matin même.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>États</h2>
+      <p class="demo-note">
+        Chargement, résultat vide, erreur. Les trois pages en auront besoin.
+      </p>
+
+      <div class="k-grid">
+        <div class="k-card">
+          <div class="k-state">
+            <div class="k-spinner"></div>
+            <p class="k-state__title">Recherche en cours…</p>
+            <p style="margin:0;font-size:14px">Cela peut prendre un moment.</p>
+          </div>
+        </div>
+
+        <div class="k-card">
+          <div class="k-state">
+            <p class="k-state__title">Aucun résultat</p>
+            <p style="margin:0;font-size:14px">Essaie une autre date ou un autre départ.</p>
+          </div>
+        </div>
+
+        <div class="k-card">
+          <div class="k-state k-state--error">
+            <p class="k-state__title">Données indisponibles</p>
+            <p style="margin:0;font-size:14px">La dernière mise à jour a échoué.</p>
+            <button class="k-btn" type="button">Réessayer</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="k-footer">
+    Kit commun — <a href="/">retour au menu</a>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+name: Déploiement
+
+# Toute poussée sur main met le site à jour. Le bouton « Run workflow »
+# de l'onglet Actions permet aussi de relancer un déploiement à la main.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Deux poussées rapprochées ne doivent pas se marcher dessus : la
+# seconde attend la fin de la première plutôt que de l'annuler, sinon
+# on risque de laisser le serveur dans un état intermédiaire.
+concurrency:
+  group: deploiement
+  cancel-in-progress: false
+
+jobs:
+  deployer:
+    name: Vérifier puis déployer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      # ---- Garde-fous : on ne pousse pas un site cassé en production ----
+
+      - name: Vérifier la syntaxe des scripts
+        run: |
+          for f in js/*.js; do
+            echo "· $f"
+            node --check "$f"
+          done
+
+      - name: Vérifier le sitemap
+        run: python3 -c "import xml.dom.minidom; xml.dom.minidom.parse('sitemap.xml')"
+
+      - name: Vérifier la présence des fichiers essentiels
+        run: |
+          manquants=0
+          for f in index.html css/style.css js/app.js js/projects.js \
+                   kit/kit.css robots.txt sitemap.xml assets/og-cover.png; do
+            if [ ! -f "$f" ]; then
+              echo "manquant : $f"
+              manquants=1
+            fi
+          done
+          exit $manquants
+
+      # ---- Déploiement ----
+
+      - name: Installer la clé de déploiement
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # Clés d'hôte versionnées : le serveur est épinglé, une
+          # substitution d'hôte fait échouer le déploiement.
+          cp .github/known_hosts ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      # La clé est bridée côté serveur par rrsync : elle ne peut rien
+      # faire d'autre qu'écrire dans /var/www/wii-portfolio, ce qui
+      # explique la destination « :/ » — elle est relative à ce dossier.
+      - name: Synchroniser vers le serveur
+        run: |
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='README.md' \
+            --exclude='data/' \
+            -e "ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes" \
+            ./ ubuntu@51.210.97.104:/
+
+      - name: Retirer la clé
+        if: always()
+        run: rm -f ~/.ssh/id_ed25519
+
+      # ---- Contrôle après coup ----
+
+      - name: Vérifier que le site répond
+        run: |
+          for essai in 1 2 3; do
+            accueil=$(curl -sS -o /dev/null -w '%{http_code}' https://louishanquiez.fr/)
+            kit=$(curl -sS -o /dev/null -w '%{http_code}' https://louishanquiez.fr/kit/kit.css)
+            if [ "$accueil" = "200" ] && [ "$kit" = "200" ]; then
+              echo "site en ligne (accueil $accueil, kit $kit)"
+              exit 0
+            fi
+            echo "tentative $essai : accueil $accueil, kit $kit"
+            sleep 5
+          done
+          echo "le site ne répond pas correctement après déploiement"
+          exit 1
