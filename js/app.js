@@ -7,7 +7,20 @@
 (function () {
   "use strict";
 
-  var PER_PAGE = 12;
+  /* La grille passe de 4 à 3 puis 2 colonnes (voir les media queries de
+     style.css). Le nombre de chaînes par page suit, pour garder trois
+     rangées quoi qu'il arrive : sinon les rangées surnuméraires
+     déborderaient sous la barre du bas. Les seuils sont les mêmes que
+     ceux du CSS — s'ils changent d'un côté, changer de l'autre. */
+  var mqNarrow = window.matchMedia("(max-width: 760px)");
+  var mqTiny = window.matchMedia("(max-width: 460px)");
+
+  function perPage() {
+    if (mqTiny.matches) return 6;    // 2 colonnes
+    if (mqNarrow.matches) return 9;  // 3 colonnes
+    return 12;                       // 4 colonnes
+  }
+
   /* Musique d'ambiance : vide = désactivée. Pour l'activer, déposer le
      fichier dans audio/ puis mettre "audio/menu.mp3" ci-dessous.
      Laissé vide par défaut pour ne pas déclencher un 404 au chargement. */
@@ -18,7 +31,8 @@
      de script sans devenir une propriété de window : on y accède par le
      nom, jamais par window.PROJECTS (qui serait toujours undefined). */
   var list = (typeof PROJECTS !== "undefined" && Array.isArray(PROJECTS)) ? PROJECTS : [];
-  var pageCount = Math.max(1, Math.ceil(list.length / PER_PAGE));
+  var per = perPage();
+  var pageCount = Math.max(1, Math.ceil(list.length / per));
   var page = 0;
 
   /* localStorage peut lever une SecurityError en file:// selon le
@@ -45,6 +59,17 @@
   var btnSound = document.getElementById("btnSound");
   var zoomLayer = document.getElementById("zoomLayer");
   var flash = document.getElementById("flash");
+
+  var csRoot = document.getElementById("channelScreen");
+  var csArt = document.getElementById("csArt");
+  var csTitle = document.getElementById("csTitle");
+  var csSubtitle = document.getElementById("csSubtitle");
+  var csTech = document.getElementById("csTech");
+  var csDesc = document.getElementById("csDesc");
+  var csShots = document.getElementById("csShots");
+  var csBack = document.getElementById("csBack");
+  var csRepo = document.getElementById("csRepo");
+  var csGo = document.getElementById("csGo");
 
   /* ==========================================================
      1. Son — tout est synthétisé, aucun fichier requis
@@ -309,10 +334,14 @@
   }
 
   function render() {
-    grid.textContent = "";
-    var start = page * PER_PAGE;
+    // Un changement de palier pendant une transition de page peut laisser
+    // `page` hors bornes : on recadre plutôt que d'afficher une page vide.
+    page = Math.max(0, Math.min(pageCount - 1, page));
 
-    for (var i = 0; i < PER_PAGE; i++) {
+    grid.textContent = "";
+    var start = page * per;
+
+    for (var i = 0; i < per; i++) {
       var p = list[start + i];
       grid.appendChild(p ? makeChannel(p, start + i) : makeEmpty());
     }
@@ -348,25 +377,65 @@
 
     turning = true;
     grid.classList.add("is-turning", dir);
+
     setTimeout(function () {
       page = n;
       render();
+
+      // La nouvelle page est posée décalée du côté opposé...
       grid.classList.remove(dir);
       grid.classList.add(dir === "turn-left" ? "turn-right" : "turn-left");
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          grid.classList.remove("is-turning", "turn-left", "turn-right");
-          turning = false;
-        });
-      });
+
+      /* ...puis remise d'aplomb juste après, pour qu'elle glisse en
+         place. Une minuterie et non requestAnimationFrame : rAF est
+         gelé dans un onglet en arrière-plan, et `turning` restait
+         alors bloqué à true — la pagination ne repartait plus jamais. */
+      setTimeout(function () {
+        grid.classList.remove("is-turning", "turn-left", "turn-right");
+        turning = false;
+      }, 32);
     }, 165);
+  }
+
+  /* Le passage d'un palier de largeur à l'autre change le nombre de
+     chaînes par page : on repagine sans perdre de vue la chaîne qui
+     ouvrait la page courante. */
+  function relayout() {
+    var next = perPage();
+    if (next === per) return;
+
+    var firstShown = page * per;
+    per = next;
+    pageCount = Math.max(1, Math.ceil(list.length / per));
+    page = Math.min(pageCount - 1, Math.floor(firstShown / per));
+    render();
   }
 
   /* ==========================================================
      4. Ouverture d'une chaîne
      ========================================================== */
 
+  /* Une chaîne documentée s'ouvre sur son écran de présentation ; les
+     autres partent directement, comme avant. */
+  function hasDetail(p) {
+    return !!(p.description || p.repo ||
+              (p.tech && p.tech.length) ||
+              (p.shots && p.shots.length));
+  }
+
   function open(p, faceEl) {
+    if (!p.url && !hasDetail(p)) return;
+
+    if (hasDetail(p)) {
+      Sound.click();
+      openChannelScreen(p, faceEl);
+      return;
+    }
+
+    launch(p, faceEl);
+  }
+
+  function launch(p, faceEl) {
     if (!p.url) return;
 
     // Nouvel onglet : il faut ouvrir dans le geste utilisateur,
@@ -384,6 +453,14 @@
     }
 
     Sound.launch();
+
+    /* Départ depuis l'écran de présentation : il n'y a plus de vignette
+       d'où s'envoler, le flash suffit à couvrir la transition. */
+    if (!faceEl) {
+      setTimeout(function () { flash.classList.add("on"); }, 110);
+      setTimeout(function () { window.location.href = p.url; }, 430);
+      return;
+    }
 
     var rect = faceEl.getBoundingClientRect();
     var vw = window.innerWidth;
@@ -411,6 +488,143 @@
 
     setTimeout(function () { flash.classList.add("on"); }, 330);
     setTimeout(function () { window.location.href = p.url; }, 620);
+  }
+
+  /* ==========================================================
+     4 bis. Écran de présentation d'une chaîne
+     ========================================================== */
+
+  var csProject = null;   // le projet affiché
+  var csOpener = null;    // la chaîne d'où l'on vient, pour lui rendre le focus
+
+  function csIsOpen() { return !csRoot.hidden; }
+
+  /* Tout est construit en textContent : les champs de projects.js ne
+     sont jamais interprétés comme du HTML. */
+  function fillChannelScreen(p) {
+    csTitle.textContent = p.title;
+
+    csSubtitle.textContent = p.subtitle || "";
+    csSubtitle.hidden = !p.subtitle;
+
+    csArt.textContent = "";
+    csArt.style.setProperty("--c", p.color || "#8fa3ad");
+    if (p.image) {
+      var img = document.createElement("img");
+      img.alt = "";
+      img.decoding = "async";
+      img.addEventListener("error", function () { img.remove(); });
+      img.src = p.image;
+      csArt.appendChild(img);
+    }
+
+    // Une ligne vide sépare deux paragraphes.
+    csDesc.textContent = "";
+    if (p.description) {
+      var blocks = String(p.description).split(/\n\s*\n/);
+      for (var b = 0; b < blocks.length; b++) {
+        var txt = blocks[b].trim();
+        if (!txt) continue;
+        var para = document.createElement("p");
+        para.textContent = txt;
+        csDesc.appendChild(para);
+      }
+    }
+
+    csTech.textContent = "";
+    csTech.hidden = !(p.tech && p.tech.length);
+    if (p.tech) {
+      for (var t = 0; t < p.tech.length; t++) {
+        var li = document.createElement("li");
+        li.textContent = p.tech[t];
+        csTech.appendChild(li);
+      }
+    }
+
+    csShots.textContent = "";
+    csShots.hidden = !(p.shots && p.shots.length);
+    if (p.shots) {
+      for (var s = 0; s < p.shots.length; s++) {
+        var shot = document.createElement("img");
+        shot.alt = "";
+        shot.loading = "lazy";
+        shot.decoding = "async";
+        shot.src = p.shots[s];
+        csShots.appendChild(shot);
+      }
+    }
+
+    csRepo.hidden = !p.repo;
+    if (p.repo) csRepo.href = p.repo;
+
+    // Un projet peut n'avoir qu'un dépôt, sans démo en ligne.
+    csGo.hidden = !p.url;
+  }
+
+  function openChannelScreen(p, faceEl) {
+    csProject = p;
+    csOpener = faceEl ? faceEl.parentNode : null;
+    fillChannelScreen(p);
+
+    // Le panneau grandit depuis le centre de la vignette cliquée.
+    if (faceEl) {
+      var r = faceEl.getBoundingClientRect();
+      csRoot.style.setProperty("--ox", (r.left + r.width / 2) + "px");
+      csRoot.style.setProperty("--oy", (r.top + r.height / 2) + "px");
+    } else {
+      csRoot.style.setProperty("--ox", "50%");
+      csRoot.style.setProperty("--oy", "50%");
+    }
+
+    csRoot.hidden = false;
+    csContentTop();
+
+    // Deux frames : la première pose l'état initial, la seconde anime.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { csRoot.classList.add("on"); });
+    });
+
+    (csGo.hidden ? csRepo.hidden ? csBack : csRepo : csGo).focus();
+  }
+
+  function csContentTop() {
+    var box = csRoot.querySelector(".cs-content");
+    if (box) box.scrollTop = 0;
+  }
+
+  function closeChannelScreen() {
+    if (!csIsOpen()) return;
+    Sound.click();
+    csRoot.classList.remove("on");
+
+    var done = function () {
+      csRoot.hidden = true;
+      if (csOpener && csOpener.focus) csOpener.focus();
+      csProject = null;
+      csOpener = null;
+    };
+
+    if (reduceMotion) done();
+    else setTimeout(done, 300);
+  }
+
+  /* Le panneau est modal : la tabulation ne doit pas s'en échapper. */
+  function csTrapFocus(e) {
+    if (e.key !== "Tab") return;
+
+    var items = csRoot.querySelectorAll("button:not([hidden]), a[href]:not([hidden])");
+    if (!items.length) return;
+
+    var first = items[0];
+    var last = items[items.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   /* ==========================================================
@@ -455,10 +669,37 @@
     btnSound.setAttribute("aria-label", on ? "Couper le son" : "Activer le son");
   });
 
+  csBack.addEventListener("mouseenter", Sound.hover);
+  csBack.addEventListener("click", closeChannelScreen);
+
+  csRepo.addEventListener("mouseenter", Sound.hover);
+  csRepo.addEventListener("click", function () { Sound.click(); });
+
+  csGo.addEventListener("mouseenter", Sound.hover);
+  csGo.addEventListener("click", function () {
+    if (csProject) launch(csProject, null);
+  });
+
   document.addEventListener("keydown", function (e) {
+    // Panneau ouvert : il capte le clavier, la grille est en sommeil.
+    if (csIsOpen()) {
+      if (e.key === "Escape") closeChannelScreen();
+      else csTrapFocus(e);
+      return;
+    }
+
     if (e.key === "ArrowRight") goTo(page + 1);
     else if (e.key === "ArrowLeft") goTo(page - 1);
   });
+
+  /* addListener : Safari n'a connu addEventListener sur MediaQueryList
+     qu'à partir de la version 14. */
+  function onMediaChange(mq, fn) {
+    if (mq.addEventListener) mq.addEventListener("change", fn);
+    else if (mq.addListener) mq.addListener(fn);
+  }
+  onMediaChange(mqNarrow, relayout);
+  onMediaChange(mqTiny, relayout);
 
   window.addEventListener("pageshow", function () {
     // Retour arrière depuis un projet : on remet la grille d'aplomb.
@@ -475,8 +716,37 @@
     btnSound.setAttribute("aria-label", "Activer le son");
   }
 
+  /* Les projets ne vivent que dans projects.js. Plutôt que de les
+     recopier en dur dans le HTML — deux sources à tenir d'accord —
+     on publie leur description structurée au chargement. Les moteurs
+     qui exécutent le JavaScript la lisent ; ceux qui ne l'exécutent
+     pas se rabattent sur les balises Open Graph du <head>. */
+  function publishStructuredData() {
+    if (!list.length) return;
+
+    var items = [];
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
+      var item = { "@type": "ListItem", position: i + 1, name: p.title };
+      if (p.url) item.url = p.url;
+      if (p.subtitle) item.description = p.subtitle;
+      items.push(item);
+    }
+
+    var tag = document.createElement("script");
+    tag.type = "application/ld+json";
+    tag.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Projets de Louis Hanquiez",
+      itemListElement: items
+    });
+    document.head.appendChild(tag);
+  }
+
   Sound.init();
   initPointer();
   render();
   tick();
+  publishStructuredData();
 })();

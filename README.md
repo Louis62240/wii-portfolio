@@ -21,8 +21,41 @@ Tout se passe dans **`js/projects.js`**. Un projet = un objet :
 - Sans `image`, la chaîne affiche un dégradé de la couleur `color` avec le titre
   dessus. C'est déjà propre, les vignettes peuvent attendre.
 - Les vignettes vont dans `assets/banners/`. Format idéal **4:3** (512×384 par ex.).
-- 12 chaînes par page, les pages suivantes se créent toutes seules.
+- 12 chaînes par page (9 sous 760 px, 6 sous 460 px : la grille reste sur
+  trois rangées). Les pages suivantes se créent toutes seules.
 - L'ordre de la liste = l'ordre à l'écran.
+
+### L'écran de présentation
+
+Dès qu'**un** des champs `description`, `tech`, `repo` ou `shots` est renseigné,
+le clic n'ouvre plus le lien directement : la chaîne s'agrandit en un écran qui
+présente le projet, avec les boutons **Retour** et **Démarrer**.
+
+```js
+{
+  title: "Carnet de voyages",
+  url: "https://exemple.com/voyages",
+  image: "assets/banners/voyages.jpg",
+  color: "#0aa5e0",
+  subtitle: "Web app",
+
+  description: "Ce que fait le projet.\n\nUn second paragraphe.",
+  tech: ["Vue", "Supabase"],
+  repo: "https://github.com/moi/voyages",
+  shots: ["assets/shots/voyages-1.png", "assets/shots/voyages-2.png"]
+}
+```
+
+- Une **ligne vide** dans `description` sépare deux paragraphes.
+- `repo` ajoute un bouton « Code source », toujours ouvert dans un nouvel onglet.
+  Une chaîne peut ainsi mener à deux endroits, la démo et le dépôt.
+- Sans aucun de ces champs, la chaîne se lance directement, comme avant.
+- `url` devient facultatif si le projet a une description : un projet sans démo
+  en ligne n'affiche alors que « Code source ».
+- Les textes sont insérés en `textContent`, jamais en HTML : pas de mise en forme
+  possible dans `description`, mais aucun risque d'injection non plus.
+
+`Échap` ou **Retour** referme l'écran et rend le focus à la chaîne d'origine.
 
 ### `newTab`
 
@@ -30,6 +63,7 @@ Par défaut, cliquer sur une chaîne la fait **zoomer en plein écran** puis ouv
 projet dans le même onglet — le bouton retour du navigateur ramène au menu.
 Mettre `newTab: true` ouvre dans un nouvel onglet, mais sans animation (les
 navigateurs exigent que `window.open` parte directement du clic).
+Combiné à une description, `newTab` s'applique au bouton **Démarrer**.
 
 ## Les sons
 
@@ -56,6 +90,7 @@ mémorisé dans le navigateur.
 |---|---|
 | Page suivante / précédente | `→` / `←` |
 | Navigation clavier | `Tab` puis `Entrée` |
+| Fermer l'écran de présentation | `Échap` |
 
 Le curseur main de Wiimote s'active automatiquement à la souris. Sur écran
 tactile, le curseur système reprend la main.
@@ -69,28 +104,70 @@ python -m http.server 8080
 # puis http://localhost:8080
 ```
 
-## Mettre en ligne (GitHub Pages)
+## Mise en ligne
 
-```powershell
-git init
-git add .
-git commit -m "Menu Wii"
-git branch -M main
-git remote add origin https://github.com/<moi>/<repo>.git
-git push -u origin main
+Le site est hébergé sur mon serveur, à `https://louishanquiez.fr/`.
+**Toute poussée sur `main` le déploie**, via `.github/workflows/deploy.yml`.
+
+La chaîne fait trois choses dans cet ordre :
+
+1. **elle vérifie** — syntaxe des `js/*.js`, validité de `sitemap.xml`,
+   présence des fichiers essentiels. Si l'un échoue, rien n'est déployé.
+2. **elle synchronise** — `rsync --delete` vers `/var/www/wii-portfolio`.
+3. **elle contrôle** — l'accueil et `kit/kit.css` doivent répondre 200,
+   sinon le job est en échec.
+
+Le bouton *Run workflow* de l'onglet **Actions** relance un déploiement
+sans avoir à pousser.
+
+### Ce qui n'est pas déployé
+
+`.git`, `.github`, `.gitignore`, `README.md`, et `data/` — ce dernier est
+exclu exprès pour qu'un script qui y déposerait ses JSON sur le serveur ne
+soit pas effacé au déploiement suivant.
+
+### La clé de déploiement
+
+Un seul secret GitHub, `DEPLOY_KEY` : la clé privée d'une paire dédiée,
+qui ne sert qu'à ça. Côté serveur elle est bridée dans `authorized_keys` :
+
+```
+command="/usr/bin/rrsync -wo /var/www/wii-portfolio",restrict ssh-ed25519 …
 ```
 
-Puis dans le dépôt : **Settings → Pages → Source: `main` / `root`**.
-Le site sort sur `https://<moi>.github.io/<repo>/`.
+Elle ne peut donc qu'**écrire par rsync dans le dossier du site** : aucune
+commande, aucun shell, aucune lecture ailleurs. C'est pour ça que la
+destination du `rsync` est `:/` — ce chemin est relatif au dossier autorisé.
+
+Les clés publiques du serveur sont versionnées dans `.github/known_hosts`
+(elles ne sont pas secrètes) : le serveur est épinglé, et une substitution
+d'hôte fait échouer le déploiement au lieu de livrer le site à un inconnu.
+
+### Déployer à la main, en dépannage
+
+```bash
+rsync -avz --delete \
+  --exclude='.git' --exclude='.github' --exclude='.gitignore' \
+  --exclude='README.md' --exclude='data/' \
+  -e "ssh -i ~/.ssh/wii-portfolio-deploy_key -o IdentitiesOnly=yes" \
+  ./ ubuntu@51.210.97.104:/
+```
 
 ## Structure
 
 ```
+.github/workflows/    la chaine de deploiement
+kit/kit.css           l'ADN visuel partage par mes pages
+kit/index.html        le catalogue des composants (/kit/)
 index.html            structure de la page
 css/style.css         tout le visuel
 js/projects.js        <- le seul fichier à éditer au quotidien
 js/app.js             grille, pagination, sons, curseur, transitions
+robots.txt            indexation + pointeur vers le sitemap
+sitemap.xml           les URLs du site (a completer si tu en ajoutes)
 assets/wii_hand.png   le curseur main (pixel art 27x33)
-assets/banners/       les vignettes 4:3
+assets/avatar.png     mon Mii, affiche dans le bouton rond en bas a gauche
+assets/og-cover.png   1200x630, l'apercu affiche quand on partage le lien
+assets/banners/       les vignettes 4:3, en WebP
 audio/menu.mp3        musique optionnelle
 ```

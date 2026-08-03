@@ -3,10 +3,56 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Portfolio de Louis Hanquiez</title>
-<meta name="description" content="Menu de mes projets.">
+<title>Louis Hanquiez — Portfolio de projets</title>
+<meta name="description" content="Le portfolio de Louis Hanquiez, présenté comme un menu de Wii : chaque chaîne mène à l'un de mes projets.">
+<link rel="canonical" href="https://louishanquiez.fr/">
+<meta name="author" content="Louis Hanquiez">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#23b6ee">
+
+<!-- Aperçu lors d'un partage (LinkedIn, Discord, messageries…) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Louis Hanquiez">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://louishanquiez.fr/">
+<meta property="og:title" content="Louis Hanquiez — Portfolio de projets">
+<meta property="og:description" content="Mes projets présentés comme les chaînes d'un menu de Wii.">
+<meta property="og:image" content="https://louishanquiez.fr/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Menu Wii du portfolio de Louis Hanquiez">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Louis Hanquiez — Portfolio de projets">
+<meta name="twitter:description" content="Mes projets présentés comme les chaînes d'un menu de Wii.">
+<meta name="twitter:image" content="https://louishanquiez.fr/assets/og-cover.png">
+
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23eef2f4'/><rect x='6' y='8' width='8' height='6' rx='2' fill='%2300a8e8'/><rect x='18' y='8' width='8' height='6' rx='2' fill='%23c6d2d8'/><rect x='6' y='18' width='8' height='6' rx='2' fill='%23c6d2d8'/><rect x='18' y='18' width='8' height='6' rx='2' fill='%23c6d2d8'/></svg>">
+<link rel="apple-touch-icon" href="assets/avatar.png">
 <link rel="stylesheet" href="css/style.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://louishanquiez.fr/#site",
+      "url": "https://louishanquiez.fr/",
+      "name": "Louis Hanquiez — Portfolio de projets",
+      "inLanguage": "fr-FR",
+      "publisher": { "@id": "https://louishanquiez.fr/#louis" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://louishanquiez.fr/#louis",
+      "name": "Louis Hanquiez",
+      "url": "https://louishanquiez.fr/",
+      "image": "https://louishanquiez.fr/assets/avatar.png",
+      "sameAs": ["https://github.com/Louis62240"]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -14,6 +60,19 @@
 
   <!-- ======== Zone haute : grille des chaînes ======== -->
   <main class="stage" role="main">
+
+    <!-- Le titre de la page est purement graphique : on en donne une
+         version textuelle aux lecteurs d'écran et aux moteurs. -->
+    <h1 class="sr-only">Louis Hanquiez — portfolio de projets</h1>
+
+    <noscript>
+      <p class="noscript-note">
+        Ce menu a besoin de JavaScript pour afficher les chaînes.
+        Mes projets restent consultables depuis
+        <a href="https://github.com/Louis62240">mon GitHub</a>.
+      </p>
+    </noscript>
+
     <div class="stage-inner">
 
       <button class="pager pager--prev" type="button" aria-label="Page précédente" disabled>
@@ -37,11 +96,9 @@
     <div class="dock-curve"></div>
 
     <div class="dock-content">
-      <button class="round-btn round-btn--left" type="button" id="btnHome" aria-label="Accueil">
-        <span class="logo-wii">Wii</span>
+      <button class="round-btn round-btn--left round-btn--mii" type="button" id="btnHome" aria-label="Accueil">
+        <img class="mii" src="assets/avatar.png" width="500" height="500" alt="" decoding="async">
       </button>
-
-      <div class="slot" aria-hidden="true"><span></span></div>
 
       <div class="clock">
         <div class="clock-time" id="clockTime">--:--</div>
@@ -61,6 +118,32 @@
       </button>
     </div>
   </footer>
+
+  <!-- ======== Écran de présentation d'une chaîne ======== -->
+  <div class="channel-screen" id="channelScreen" role="dialog" aria-modal="true"
+       aria-labelledby="csTitle" hidden>
+    <div class="cs-panel">
+
+      <div class="cs-content">
+        <div class="cs-art" id="csArt"></div>
+
+        <div class="cs-text">
+          <h2 class="cs-title" id="csTitle"></h2>
+          <p class="cs-subtitle" id="csSubtitle"></p>
+          <ul class="cs-tech" id="csTech" aria-label="Technologies"></ul>
+          <div class="cs-desc" id="csDesc"></div>
+          <div class="cs-shots" id="csShots"></div>
+        </div>
+      </div>
+
+      <div class="cs-dock">
+        <button class="cs-btn cs-btn--back" id="csBack" type="button">Retour</button>
+        <a class="cs-btn cs-btn--repo" id="csRepo" target="_blank" rel="noopener" hidden>Code source</a>
+        <button class="cs-btn cs-btn--go" id="csGo" type="button">Démarrer</button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Transition d'ouverture d'une chaîne -->
   <div class="zoom-layer" id="zoomLayer" aria-hidden="true"></div>
