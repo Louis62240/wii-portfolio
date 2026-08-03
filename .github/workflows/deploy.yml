@@ -49,11 +49,23 @@ jobs:
 
       # ---- Déploiement ----
 
+      # Le secret contient la clé encodée en base64, sur une seule ligne.
+      # Une clé collée telle quelle perd facilement ses retours à la
+      # ligne au copier-coller, et SSH la refuse alors silencieusement en
+      # retombant sur le mot de passe.
       - name: Installer la clé de déploiement
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          printf '%s' "${{ secrets.DEPLOY_KEY }}" | base64 -d > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+
+          # Échoue tout de suite si le secret est mal formé, plutôt que
+          # de laisser le rsync partir avec une clé inutilisable.
+          if ! ssh-keygen -l -f ~/.ssh/id_ed25519; then
+            echo "::error::le secret DEPLOY_KEY n'est pas une clé privée valide"
+            exit 1
+          fi
+
           # Clés d'hôte versionnées : le serveur est épinglé, une
           # substitution d'hôte fait échouer le déploiement.
           cp .github/known_hosts ~/.ssh/known_hosts
@@ -70,7 +82,7 @@ jobs:
             --exclude='.gitignore' \
             --exclude='README.md' \
             --exclude='data/' \
-            -e "ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes" \
+            -e "ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes" \
             ./ ubuntu@51.210.97.104:/
 
       - name: Retirer la clé
