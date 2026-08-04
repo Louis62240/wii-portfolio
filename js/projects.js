@@ -56,6 +56,7 @@ const PROJECTS = [
   {
     title: "Trains à 0 €",
     url: "/trains/",
+    image: "assets/banners/trains.webp",
     color: "#5b3fa8",
     subtitle: "TGVmax en direct",
     tech: ["JavaScript", "SNCF Open Data"],
