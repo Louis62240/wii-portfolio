@@ -405,6 +405,12 @@ body{
 
 .k-state--error .k-state__title{ color: var(--k-bad); }
 
+/* Posé dans une carte, l'état n'a pas besoin de sa marge pleine page :
+   la carte apporte déjà la sienne. */
+.k-card > .k-state{
+  padding: clamp(6px, 1.4vh, 16px) 0;
+}
+
 /* Anneau de chargement, dans le bleu de la maison. */
 .k-spinner{
   width: 38px;
