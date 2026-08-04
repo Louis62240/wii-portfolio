@@ -157,10 +157,12 @@ rsync -avz --delete \
 
 ```
 .github/workflows/    la chaine de deploiement
-kit/kit.css           l'ADN visuel partage par mes pages
+kit/kit.css           l'ADN visuel partage par mes pages (couleurs, typo,
+                      composants) -- le menu s'en sert aussi
 kit/index.html        le catalogue des composants (/kit/)
 index.html            structure de la page
-css/style.css         tout le visuel
+css/style.css         ce qui est propre au menu : grille, curseur
+                      Wiimote, ecran de presentation
 js/projects.js        <- le seul fichier à éditer au quotidien
 js/app.js             grille, pagination, sons, curseur, transitions
 robots.txt            indexation + pointeur vers le sitemap
