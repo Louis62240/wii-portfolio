@@ -52,5 +52,19 @@ const PROJECTS = [
       "Les recherches respectent le crawl-delay des sites interrogés : " +
       "une requête large peut demander plusieurs minutes avant de rendre " +
       "ses résultats."
+  },
+  {
+    title: "Trains à 0 €",
+    url: "/trains/",
+    color: "#5b3fa8",
+    subtitle: "TGVmax en direct",
+    tech: ["JavaScript", "SNCF Open Data"],
+    description:
+      "Tous les trains réservables à 0 € avec un abonnement TGVmax, entre " +
+      "deux gares, sur les trente jours publiés par la SNCF.\n\n" +
+      "La page interroge l'open data SNCF directement depuis le navigateur : " +
+      "aucun serveur, aucune base, et des horaires toujours à jour. Un bot " +
+      "Discord surveille en parallèle les mêmes données et signale les " +
+      "nouveaux trains dès qu'ils apparaissent."
   }
 ];

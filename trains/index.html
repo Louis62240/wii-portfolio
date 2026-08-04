@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trains à 0 € — TGVmax</title>
+<meta name="description" content="Tous les trains à 0 € avec TGVmax, entre deux gares, sur les jours à venir.">
+<meta name="theme-color" content="#23b6ee">
+<link rel="canonical" href="https://louishanquiez.fr/trains/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Louis Hanquiez">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://louishanquiez.fr/trains/">
+<meta property="og:title" content="Trains à 0 € — TGVmax">
+<meta property="og:description" content="Tous les trains à 0 € avec TGVmax, entre deux gares, sur les jours à venir.">
+<meta property="og:image" content="https://louishanquiez.fr/assets/og-cover.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23eef2f4'/><circle cx='16' cy='16' r='8' fill='%2300a8e8'/></svg>">
+<link rel="stylesheet" href="/kit/kit.css">
+<style>
+  /* Le strict nécessaire : tout le reste vient du kit. */
+  .t-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: var(--k-gap);
+  }
+  .t-grid .k-field{ display: flex; }
+  .t-grid .k-input, .t-grid .k-select{ width: 100%; }
+
+  .t-legend{
+    display: block;
+    margin-bottom: .5em;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--k-ink-soft);
+  }
+  .t-checks{ display: flex; flex-wrap: wrap; gap: 10px 18px; }
+
+  .t-section + .t-section{
+    margin-top: var(--k-gap);
+    padding-top: var(--k-gap);
+    border-top: 1px solid var(--k-frame-edge);
+  }
+
+  .t-h2{
+    margin: clamp(24px,4vh,38px) 0 clamp(10px,2vh,16px);
+    font-size: clamp(17px,2vw,23px);
+    font-weight: 700;
+    color: var(--k-ink-strong);
+  }
+  .t-h2 small{ font-weight: 400; color: var(--k-ink-soft); }
+
+  .t-note{ margin: 0; font-size: 13px; color: var(--k-ink-soft); }
+  .t-time{ font-variant-numeric: tabular-nums; }
+  .t-train{ color: var(--k-ink-soft); font-variant-numeric: tabular-nums; }
+  .k-table td.t-trajet{ white-space: normal; font-weight: 700; min-width: 16ch; }
+  .t-jour{ font-weight: 700; }
+  .t-we{ color: #2f7a2f; }
+</style>
+</head>
+<body>
+
+<div class="k-screen">
+
+  <header class="k-header">
+    <h1 class="k-title">Trains à 0 €</h1>
+    <p class="k-lede">
+      Tous les trains réservables à 0 € avec un abonnement <strong>TGVmax</strong>,
+      entre deux gares. Les données viennent de l'open data SNCF, interrogé
+      en direct à chaque recherche.
+    </p>
+  </header>
+
+  <main class="k-main">
+
+    <form class="k-card" id="form">
+
+      <div class="t-section t-grid">
+        <label class="k-field">
+          <span class="k-label">Gare A</span>
+          <input class="k-input" id="gareA" list="gares" value="LILLE" autocomplete="off" required>
+        </label>
+        <label class="k-field">
+          <span class="k-label">Gare B</span>
+          <input class="k-input" id="gareB" list="gares" value="PARIS" autocomplete="off" required>
+        </label>
+        <label class="k-field">
+          <span class="k-label">Sens</span>
+          <select class="k-select" id="sens">
+            <option value="both">Les deux sens</option>
+            <option value="ab">A → B seulement</option>
+            <option value="ba">B → A seulement</option>
+          </select>
+        </label>
+        <label class="k-field">
+          <span class="k-label">Jours à explorer</span>
+          <input class="k-input" type="number" id="jours" value="30" min="1" max="30">
+        </label>
+      </div>
+
+      <datalist id="gares"></datalist>
+
+      <div class="t-section t-grid">
+        <label class="k-field">
+          <span class="k-label">Départ — pas avant</span>
+          <input class="k-input" type="time" id="heureMin">
+        </label>
+        <label class="k-field">
+          <span class="k-label">Départ — pas après</span>
+          <input class="k-input" type="time" id="heureMax">
+        </label>
+        <label class="k-field">
+          <span class="k-label">Trier par</span>
+          <select class="k-select" id="tri">
+            <option value="date">Date puis heure</option>
+            <option value="heure">Heure de départ</option>
+            <option value="duree">Durée du trajet</option>
+            <option value="trajet">Trajet (A→Z)</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="t-section">
+        <span class="t-legend">Jours de circulation — aucun coché = tous</span>
+        <div class="t-checks" id="jourscoches"></div>
+      </div>
+
+      <div class="k-bar" style="margin-bottom:0">
+        <button class="k-btn k-btn--primary" type="submit" id="btn">Chercher</button>
+        <button class="k-btn" type="button" id="btnWe">Week-ends uniquement</button>
+        <p class="t-note">Recherche directe dans l'open data SNCF, sans intermédiaire.</p>
+      </div>
+
+    </form>
+
+    <div id="zone"></div>
+
+  </main>
+
+  <footer class="k-footer">
+    Trains à 0 € — <a href="/">retour au menu</a> ·
+    <a href="https://ressources.data.sncf.com/explore/dataset/tgvmax/" target="_blank" rel="noopener">source des données</a>
+  </footer>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
