@@ -38,7 +38,12 @@
   }
   .t-checks{ display: flex; flex-wrap: wrap; gap: 10px 18px; }
 
-  .t-section + .t-section{
+  .t-section{ margin-bottom: var(--k-gap); }
+
+  /* `:not(:first-child)` plutôt que `+` : un élément invisible glissé
+     entre deux sections (le <datalist> des gares, par exemple) romprait
+     l'adjacence et supprimerait silencieusement le filet. */
+  .t-section:not(:first-child){
     margin-top: var(--k-gap);
     padding-top: var(--k-gap);
     border-top: 1px solid var(--k-frame-edge);
@@ -100,8 +105,6 @@
         </label>
       </div>
 
-      <datalist id="gares"></datalist>
-
       <div class="t-section t-grid">
         <label class="k-field">
           <span class="k-label">Départ — pas avant</span>
@@ -132,6 +135,10 @@
         <button class="k-btn" type="button" id="btnWe">Week-ends uniquement</button>
         <p class="t-note">Recherche directe dans l'open data SNCF, sans intermédiaire.</p>
       </div>
+
+      <!-- Invisible : sa place dans le document n'a aucune importance, on
+           l'écarte du flux des sections pour ne pas gêner leur espacement. -->
+      <datalist id="gares"></datalist>
 
     </form>
 
