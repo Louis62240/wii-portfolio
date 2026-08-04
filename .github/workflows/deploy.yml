@@ -49,20 +49,38 @@ jobs:
 
       # ---- Déploiement ----
 
-      # Le secret contient la clé encodée en base64, sur une seule ligne.
-      # Une clé collée telle quelle perd facilement ses retours à la
-      # ligne au copier-coller, et SSH la refuse alors silencieusement en
-      # retombant sur le mot de passe.
+      # DEPLOY_KEY est accepté sous deux formes, parce qu'une clé privée
+      # multiligne perd facilement ses retours à la ligne au
+      # copier-coller — et SSH la refuse alors sans rien dire, en
+      # retombant sur le mot de passe :
+      #   · la clé PEM telle quelle ;
+      #   · la même encodée en base64 sur une seule ligne.
       - name: Installer la clé de déploiement
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           mkdir -p ~/.ssh
-          printf '%s' "${{ secrets.DEPLOY_KEY }}" | base64 -d > ~/.ssh/id_ed25519
+
+          taille=$(printf '%s' "$DEPLOY_KEY" | wc -c)
+          echo "longueur du secret : $taille caractères"
+          if [ "$taille" -eq 0 ]; then
+            echo "::error::le secret DEPLOY_KEY est vide ou absent du dépôt"
+            exit 1
+          fi
+
+          if printf '%s' "$DEPLOY_KEY" | grep -q -- '-----BEGIN'; then
+            echo "forme détectée : clé PEM"
+            printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          else
+            echo "forme détectée : base64"
+            printf '%s' "$DEPLOY_KEY" | tr -d '[:space:]' | base64 -d > ~/.ssh/id_ed25519
+          fi
           chmod 600 ~/.ssh/id_ed25519
 
-          # Échoue tout de suite si le secret est mal formé, plutôt que
-          # de laisser le rsync partir avec une clé inutilisable.
+          # Échouer ici, avec un message clair, plutôt que de laisser le
+          # rsync partir avec une clé inutilisable.
           if ! ssh-keygen -l -f ~/.ssh/id_ed25519; then
-            echo "::error::le secret DEPLOY_KEY n'est pas une clé privée valide"
+            echo "::error::DEPLOY_KEY n'est ni une clé privée valide, ni le base64 d'une clé valide"
             exit 1
           fi
 
