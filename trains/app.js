@@ -135,6 +135,44 @@
     return trouves;
   }
 
+  // Contrairement à trainsGratuits (une paire de gares fixe), ici la
+  // destination est libre : "toutes les destinations à 0 € au départ de
+  // cette gare". Plutôt que de rapatrier un train par ligne (des milliers
+  // sur 30 jours), on laisse l'API agréger elle-même par destination
+  // (select + group_by) : une poignée de requêtes suffit.
+  async function destinationsPartout(de, jours) {
+    const debut = new Date();
+    const fin = new Date();
+    fin.setDate(fin.getDate() + jours);
+
+    const where = [
+      'od_happy_card="OUI"',
+      `origine like "${echapper(de)}"`,
+      `date in ["${isoDate(debut)}".."${isoDate(fin)}"]`,
+    ].join(" and ");
+
+    const destinations = [];
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const url = new URL(`${API}/records`);
+      url.searchParams.set("where", where);
+      url.searchParams.set("select", "destination, count(*) as nb, min(date) as premiere_date");
+      url.searchParams.set("group_by", "destination");
+      url.searchParams.set("order_by", "premiere_date,destination");
+      url.searchParams.set("limit", String(PAR_PAGE));
+      url.searchParams.set("offset", String(page * PAR_PAGE));
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`l'API SNCF a répondu ${res.status}`);
+      }
+      const data = await res.json();
+      destinations.push(...(data.results || []));
+
+      if (destinations.length >= (data.total_count || 0) || !data.results?.length) break;
+    }
+    return destinations;
+  }
+
   /* ==========================================================
      Filtres et tri, appliqués sur ce que l'API a renvoyé
      ========================================================== */
@@ -269,6 +307,65 @@
     zone.appendChild(wrap);
   }
 
+  function rendrePartout(destinations, origine) {
+    zone.innerHTML = "";
+
+    if (!destinations.length) {
+      etat(
+        "Aucune destination à 0 € trouvée",
+        "Essaie d'élargir la période ou de changer de gare de départ."
+      );
+      return;
+    }
+
+    const titre = document.createElement("h2");
+    titre.className = "t-h2";
+    titre.textContent = `${destinations.length} destination${destinations.length > 1 ? "s" : ""} à 0 € `;
+    const petit = document.createElement("small");
+    petit.textContent = `depuis ${origine}`;
+    titre.appendChild(petit);
+    zone.appendChild(titre);
+
+    const wrap = document.createElement("div");
+    wrap.className = "k-table-wrap";
+    const table = document.createElement("table");
+    table.className = "k-table";
+
+    table.innerHTML =
+      "<thead><tr>" +
+      "<th scope='col'>Destination</th><th scope='col'>Dès le</th>" +
+      "<th scope='col' class='k-table__num'>Trains</th>" +
+      "</tr></thead>";
+
+    const tbody = document.createElement("tbody");
+    for (const d of destinations) {
+      const dateIso = (d.premiere_date || "").slice(0, 10);
+      const jour = new Date(`${dateIso}T00:00:00`).getDay();
+      const weekend = jour === 0 || jour === 6;
+
+      const tr = document.createElement("tr");
+
+      const tdDest = document.createElement("td");
+      tdDest.className = "t-trajet";
+      tdDest.textContent = d.destination;
+
+      const tdDate = document.createElement("td");
+      tdDate.className = "t-jour" + (weekend ? " t-we" : "");
+      tdDate.textContent = dateFr(dateIso);
+      tdDate.title = JOURS_FR[jour];
+
+      const tdNb = document.createElement("td");
+      tdNb.className = "k-table__num t-time";
+      tdNb.textContent = d.nb;
+
+      tr.append(tdDest, tdDate, tdNb);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    zone.appendChild(wrap);
+  }
+
   /* ==========================================================
      Enchaînement
      ========================================================== */
@@ -307,9 +404,55 @@
     }
   }
 
+  async function chercherPartout() {
+    if (enCours) return;
+    const de = $("garePartout").value.trim();
+    if (!de) {
+      etat("Il manque une gare", "Renseigne la gare de départ.", true);
+      return;
+    }
+
+    enCours = true;
+    $("btn").disabled = true;
+    etat("Recherche en cours…", "Interrogation de l'open data SNCF.", false, true);
+
+    const jours = Math.min(30, Math.max(1, Number($("joursPartout").value) || 14));
+
+    try {
+      const destinations = await destinationsPartout(de, jours);
+      rendrePartout(destinations, de);
+    } catch (e) {
+      etat("La recherche a échoué", String(e.message || e), true);
+    } finally {
+      enCours = false;
+      $("btn").disabled = false;
+    }
+  }
+
+  /* ==========================================================
+     Bascule entre les deux modes (deux boutons en guise d'onglets)
+     ========================================================== */
+
+  let modeActuel = "pair";
+
+  function definirMode(mode) {
+    modeActuel = mode;
+    form.classList.toggle("t-mode--anywhere", mode === "anywhere");
+    $("modePair").classList.toggle("k-btn--primary", mode === "pair");
+    $("modeAnywhere").classList.toggle("k-btn--primary", mode === "anywhere");
+    $("modePair").setAttribute("aria-selected", String(mode === "pair"));
+    $("modeAnywhere").setAttribute("aria-selected", String(mode === "anywhere"));
+    if (mode === "pair") chercher();
+    else chercherPartout();
+  }
+
+  $("modePair").addEventListener("click", () => definirMode("pair"));
+  $("modeAnywhere").addEventListener("click", () => definirMode("anywhere"));
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    chercher();
+    if (modeActuel === "anywhere") chercherPartout();
+    else chercher();
   });
 
   // Raccourci : le motif que surveille le bot, week-ends compris.

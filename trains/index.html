@@ -63,6 +63,14 @@
   .k-table td.t-trajet{ white-space: normal; font-weight: 700; min-width: 16ch; }
   .t-jour{ font-weight: 700; }
   .t-we{ color: #2f7a2f; }
+
+  /* Bascule entre les deux modes de recherche : deux boutons qui
+     jouent le rôle d'onglets, sans composant dédié dans le kit. */
+  .t-modes{ display: flex; gap: 8px; margin-bottom: var(--k-gap); }
+  .t-mode-anywhere{ display: none; }
+  #form.t-mode--anywhere .t-mode-pair{ display: none; }
+  #form.t-mode--anywhere .t-section.t-mode-anywhere{ display: grid; }
+  #form.t-mode--anywhere p.t-mode-anywhere{ display: block; }
 </style>
 </head>
 <body>
@@ -73,23 +81,28 @@
     <h1 class="k-title">Trains à 0 €</h1>
     <p class="k-lede">
       Tous les trains réservables à 0 € avec un abonnement <strong>TGVmax</strong>,
-      entre deux gares. Les données viennent de l'open data SNCF, interrogé
-      en direct à chaque recherche.
+      entre deux gares ou depuis une seule vers n'importe où. Les données
+      viennent de l'open data SNCF, interrogé en direct à chaque recherche.
     </p>
   </header>
 
   <main class="k-main">
 
+    <div class="t-modes" role="tablist">
+      <button class="k-btn k-btn--primary" type="button" id="modePair" role="tab" aria-selected="true">Entre deux gares</button>
+      <button class="k-btn" type="button" id="modeAnywhere" role="tab" aria-selected="false">Depuis une gare, partout</button>
+    </div>
+
     <form class="k-card" id="form">
 
-      <div class="t-section t-grid">
+      <div class="t-section t-grid t-mode-pair">
         <label class="k-field">
           <span class="k-label">Gare A</span>
-          <input class="k-input" id="gareA" list="gares" value="LILLE" autocomplete="off" required>
+          <input class="k-input" id="gareA" list="gares" value="LILLE" autocomplete="off">
         </label>
         <label class="k-field">
           <span class="k-label">Gare B</span>
-          <input class="k-input" id="gareB" list="gares" value="PARIS" autocomplete="off" required>
+          <input class="k-input" id="gareB" list="gares" value="PARIS" autocomplete="off">
         </label>
         <label class="k-field">
           <span class="k-label">Sens</span>
@@ -105,7 +118,18 @@
         </label>
       </div>
 
-      <div class="t-section t-grid">
+      <div class="t-section t-grid t-mode-anywhere">
+        <label class="k-field">
+          <span class="k-label">Gare de départ</span>
+          <input class="k-input" id="garePartout" list="gares" value="PARIS" autocomplete="off">
+        </label>
+        <label class="k-field">
+          <span class="k-label">Jours à explorer</span>
+          <input class="k-input" type="number" id="joursPartout" value="14" min="1" max="30">
+        </label>
+      </div>
+
+      <div class="t-section t-grid t-mode-pair">
         <label class="k-field">
           <span class="k-label">Départ — pas avant</span>
           <input class="k-input" type="time" id="heureMin">
@@ -125,15 +149,16 @@
         </label>
       </div>
 
-      <div class="t-section">
+      <div class="t-section t-mode-pair">
         <span class="t-legend">Jours de circulation — aucun coché = tous</span>
         <div class="t-checks" id="jourscoches"></div>
       </div>
 
       <div class="k-bar" style="margin-bottom:0">
         <button class="k-btn k-btn--primary" type="submit" id="btn">Chercher</button>
-        <button class="k-btn" type="button" id="btnWe">Week-ends uniquement</button>
-        <p class="t-note">Recherche directe dans l'open data SNCF, sans intermédiaire.</p>
+        <button class="k-btn t-mode-pair" type="button" id="btnWe">Week-ends uniquement</button>
+        <p class="t-note t-mode-pair">Recherche directe dans l'open data SNCF, sans intermédiaire.</p>
+        <p class="t-note t-mode-anywhere">Classé par destination, du plus proche au plus lointain dans le temps.</p>
       </div>
 
       <!-- Invisible : sa place dans le document n'a aucune importance, on
