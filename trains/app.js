@@ -135,29 +135,31 @@
     return trouves;
   }
 
-  // Contrairement à trainsGratuits (une paire de gares fixe), ici la
-  // destination est libre : "toutes les destinations à 0 € au départ de
-  // cette gare". Plutôt que de rapatrier un train par ligne (des milliers
-  // sur 30 jours), on laisse l'API agréger elle-même par destination
-  // (select + group_by) : une poignée de requêtes suffit.
-  async function destinationsPartout(de, jours) {
+  // Contrairement à trainsGratuits (une paire de gares fixe), ici on fixe
+  // un seul champ (origine OU destination) et on laisse l'autre libre, en
+  // le faisant agréger par l'API (select + group_by) plutôt que de
+  // rapatrier un train par ligne (des milliers sur 30 jours) : une
+  // poignée de requêtes suffit. champGroupe vaut "destination" (liste des
+  // villes accessibles depuis champFixe) ou "origine" (liste des villes
+  // d'où revenir vers champFixe) — sert aux deux sens du mode "partout".
+  async function agregerTrains(champFixe, valeurFixe, champGroupe, jours) {
     const debut = new Date();
     const fin = new Date();
     fin.setDate(fin.getDate() + jours);
 
     const where = [
       'od_happy_card="OUI"',
-      `origine like "${echapper(de)}"`,
+      `${champFixe} like "${echapper(valeurFixe)}"`,
       `date in ["${isoDate(debut)}".."${isoDate(fin)}"]`,
     ].join(" and ");
 
-    const destinations = [];
+    const lignes = [];
     for (let page = 0; page < MAX_PAGES; page++) {
       const url = new URL(`${API}/records`);
       url.searchParams.set("where", where);
-      url.searchParams.set("select", "destination, count(*) as nb, min(date) as premiere_date");
-      url.searchParams.set("group_by", "destination");
-      url.searchParams.set("order_by", "premiere_date,destination");
+      url.searchParams.set("select", `${champGroupe}, count(*) as nb, min(date) as premiere_date`);
+      url.searchParams.set("group_by", champGroupe);
+      url.searchParams.set("order_by", `premiere_date,${champGroupe}`);
       url.searchParams.set("limit", String(PAR_PAGE));
       url.searchParams.set("offset", String(page * PAR_PAGE));
 
@@ -166,11 +168,31 @@
         throw new Error(`l'API SNCF a répondu ${res.status}`);
       }
       const data = await res.json();
-      destinations.push(...(data.results || []));
+      lignes.push(...(data.results || []));
 
-      if (destinations.length >= (data.total_count || 0) || !data.results?.length) break;
+      if (lignes.length >= (data.total_count || 0) || !data.results?.length) break;
     }
-    return destinations;
+    return lignes;
+  }
+
+  // Pour chaque destination accessible depuis `de`, on regarde aussi si un
+  // retour existe (même ville, comme origine cette fois vers `de`) : c'est
+  // ce qui permet de repérer d'un coup d'œil un aller-retour possible,
+  // sans avoir à re-chercher chaque ville une par une.
+  async function destinationsAllerRetour(de, jours) {
+    const [aller, retour] = await Promise.all([
+      agregerTrains("origine", de, "destination", jours),
+      agregerTrains("destination", de, "origine", jours),
+    ]);
+
+    const retourParVille = new Map(retour.map((r) => [r.origine, r]));
+
+    return aller.map((d) => ({
+      destination: d.destination,
+      nb: d.nb,
+      premiere_date: d.premiere_date,
+      retour: retourParVille.get(d.destination) || null,
+    }));
   }
 
   /* ==========================================================
@@ -307,6 +329,29 @@
     zone.appendChild(wrap);
   }
 
+  // Une cellule "dès le [date] (n trains)", ou un badge d'absence si la
+  // liste n'a rien pour cette ville (pas de retour trouvé sur la période).
+  function celluleDateTrains(entree, texteAbsence) {
+    const td = document.createElement("td");
+    if (!entree) {
+      const badge = document.createElement("span");
+      badge.className = "k-chip k-chip--warn";
+      badge.textContent = texteAbsence;
+      td.appendChild(badge);
+      return td;
+    }
+
+    const dateIso = (entree.premiere_date || "").slice(0, 10);
+    const jour = new Date(`${dateIso}T00:00:00`).getDay();
+    const weekend = jour === 0 || jour === 6;
+
+    td.className = "t-jour" + (weekend ? " t-we" : "");
+    td.title = JOURS_FR[jour];
+    const trainWord = entree.nb > 1 ? "trains" : "train";
+    td.textContent = `${dateFr(dateIso)} (${entree.nb} ${trainWord})`;
+    return td;
+  }
+
   function rendrePartout(destinations, origine) {
     zone.innerHTML = "";
 
@@ -322,7 +367,7 @@
     titre.className = "t-h2";
     titre.textContent = `${destinations.length} destination${destinations.length > 1 ? "s" : ""} à 0 € `;
     const petit = document.createElement("small");
-    petit.textContent = `depuis ${origine}`;
+    petit.textContent = `depuis ${origine} — clique une ligne pour voir le détail des horaires`;
     titre.appendChild(petit);
     zone.appendChild(titre);
 
@@ -333,32 +378,31 @@
 
     table.innerHTML =
       "<thead><tr>" +
-      "<th scope='col'>Destination</th><th scope='col'>Dès le</th>" +
-      "<th scope='col' class='k-table__num'>Trains</th>" +
+      "<th scope='col'>Destination</th><th scope='col'>Aller</th>" +
+      "<th scope='col'>Retour</th>" +
       "</tr></thead>";
 
     const tbody = document.createElement("tbody");
     for (const d of destinations) {
-      const dateIso = (d.premiere_date || "").slice(0, 10);
-      const jour = new Date(`${dateIso}T00:00:00`).getDay();
-      const weekend = jour === 0 || jour === 6;
-
       const tr = document.createElement("tr");
+      tr.className = "t-row-click";
+      tr.tabIndex = 0;
+      tr.title = "Voir le détail des horaires aller-retour";
+
+      const ouvrirDetail = () => voirDetailAllerRetour(origine, d.destination);
+      tr.addEventListener("click", ouvrirDetail);
+      tr.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          ouvrirDetail();
+        }
+      });
 
       const tdDest = document.createElement("td");
       tdDest.className = "t-trajet";
       tdDest.textContent = d.destination;
 
-      const tdDate = document.createElement("td");
-      tdDate.className = "t-jour" + (weekend ? " t-we" : "");
-      tdDate.textContent = dateFr(dateIso);
-      tdDate.title = JOURS_FR[jour];
-
-      const tdNb = document.createElement("td");
-      tdNb.className = "k-table__num t-time";
-      tdNb.textContent = d.nb;
-
-      tr.append(tdDest, tdDate, tdNb);
+      tr.append(tdDest, celluleDateTrains(d, "—"), celluleDateTrains(d.retour, "Pas de retour trouvé"));
       tbody.appendChild(tr);
     }
     table.appendChild(tbody);
@@ -419,7 +463,7 @@
     const jours = Math.min(30, Math.max(1, Number($("joursPartout").value) || 14));
 
     try {
-      const destinations = await destinationsPartout(de, jours);
+      const destinations = await destinationsAllerRetour(de, jours);
       rendrePartout(destinations, de);
     } catch (e) {
       etat("La recherche a échoué", String(e.message || e), true);
@@ -448,6 +492,16 @@
 
   $("modePair").addEventListener("click", () => definirMode("pair"));
   $("modeAnywhere").addEventListener("click", () => definirMode("anywhere"));
+
+  // Clic sur une ligne du mode "partout" : bascule vers le mode détaillé,
+  // gares déjà remplies, pour voir les horaires précis de l'aller-retour.
+  function voirDetailAllerRetour(origine, destination) {
+    $("gareA").value = origine;
+    $("gareB").value = destination;
+    $("sens").value = "both";
+    definirMode("pair");
+    zone.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
