@@ -135,6 +135,38 @@
     return trouves;
   }
 
+  // L'API ne sait pas filtrer par jour de la semaine (testé : ni fonction
+  // dayofweek(), ni "date in [liste]" — seul "date in [debut..fin]", un
+  // intervalle, est accepté). Pour cibler juste certains jours, on énumère
+  // les dates qui nous intéressent dans la fenêtre et on les OR ensemble,
+  // chacune comme un intervalle d'un seul jour.
+  function joursCandidats(jours, weekdaysCibles) {
+    const dates = [];
+    const curseur = new Date();
+    for (let i = 0; i <= jours; i++) {
+      if (weekdaysCibles.includes(curseur.getDay())) dates.push(isoDate(curseur));
+      curseur.setDate(curseur.getDate() + 1);
+    }
+    return dates;
+  }
+
+  // weekdaysCibles : liste de jours (0=dimanche ... 6=samedi, comme
+  // Date#getDay()) à laquelle restreindre la recherche, ou null pour
+  // garder toute la fenêtre sans distinction de jour.
+  function clauseDates(jours, weekdaysCibles) {
+    const debut = new Date();
+    const fin = new Date();
+    fin.setDate(fin.getDate() + jours);
+
+    if (!weekdaysCibles) {
+      return `date in ["${isoDate(debut)}".."${isoDate(fin)}"]`;
+    }
+
+    const dates = joursCandidats(jours, weekdaysCibles);
+    if (dates.length === 0) return null; // aucun des jours ciblés dans la fenêtre
+    return "(" + dates.map((d) => `date in ["${d}".."${d}"]`).join(" or ") + ")";
+  }
+
   // Contrairement à trainsGratuits (une paire de gares fixe), ici on fixe
   // un seul champ (origine OU destination) et on laisse l'autre libre, en
   // le faisant agréger par l'API (select + group_by) plutôt que de
@@ -142,15 +174,14 @@
   // poignée de requêtes suffit. champGroupe vaut "destination" (liste des
   // villes accessibles depuis champFixe) ou "origine" (liste des villes
   // d'où revenir vers champFixe) — sert aux deux sens du mode "partout".
-  async function agregerTrains(champFixe, valeurFixe, champGroupe, jours) {
-    const debut = new Date();
-    const fin = new Date();
-    fin.setDate(fin.getDate() + jours);
+  async function agregerTrains(champFixe, valeurFixe, champGroupe, jours, weekdaysCibles = null) {
+    const clauseDate = clauseDates(jours, weekdaysCibles);
+    if (!clauseDate) return [];
 
     const where = [
       'od_happy_card="OUI"',
       `${champFixe} like "${echapper(valeurFixe)}"`,
-      `date in ["${isoDate(debut)}".."${isoDate(fin)}"]`,
+      clauseDate,
     ].join(" and ");
 
     const lignes = [];
@@ -179,10 +210,13 @@
   // retour existe (même ville, comme origine cette fois vers `de`) : c'est
   // ce qui permet de repérer d'un coup d'œil un aller-retour possible,
   // sans avoir à re-chercher chaque ville une par une.
-  async function destinationsAllerRetour(de, jours) {
+  const VENDREDI_SAMEDI = [5, 6];
+  const DIMANCHE_LUNDI = [0, 1];
+
+  async function destinationsAllerRetour(de, jours, weekend) {
     const [aller, retour] = await Promise.all([
-      agregerTrains("origine", de, "destination", jours),
-      agregerTrains("destination", de, "origine", jours),
+      agregerTrains("origine", de, "destination", jours, weekend ? VENDREDI_SAMEDI : null),
+      agregerTrains("destination", de, "origine", jours, weekend ? DIMANCHE_LUNDI : null),
     ]);
 
     const retourParVille = new Map(retour.map((r) => [r.origine, r]));
@@ -352,13 +386,15 @@
     return td;
   }
 
-  function rendrePartout(destinations, origine) {
+  function rendrePartout(destinations, origine, weekend) {
     zone.innerHTML = "";
 
     if (!destinations.length) {
       etat(
         "Aucune destination à 0 € trouvée",
-        "Essaie d'élargir la période ou de changer de gare de départ."
+        weekend
+          ? "Essaie de décocher \"Idéal week-end\", d'élargir la période, ou de changer de gare de départ."
+          : "Essaie d'élargir la période ou de changer de gare de départ."
       );
       return;
     }
@@ -367,7 +403,9 @@
     titre.className = "t-h2";
     titre.textContent = `${destinations.length} destination${destinations.length > 1 ? "s" : ""} à 0 € `;
     const petit = document.createElement("small");
-    petit.textContent = `depuis ${origine} — clique une ligne pour voir le détail des horaires`;
+    petit.textContent = weekend
+      ? `depuis ${origine}, départ ven/sam et retour dim/lun — clique une ligne pour le détail`
+      : `depuis ${origine} — clique une ligne pour voir le détail des horaires`;
     titre.appendChild(petit);
     zone.appendChild(titre);
 
@@ -461,10 +499,11 @@
     etat("Recherche en cours…", "Interrogation de l'open data SNCF.", false, true);
 
     const jours = Math.min(30, Math.max(1, Number($("joursPartout").value) || 14));
+    const weekend = $("weekendPartout").checked;
 
     try {
-      const destinations = await destinationsAllerRetour(de, jours);
-      rendrePartout(destinations, de);
+      const destinations = await destinationsAllerRetour(de, jours, weekend);
+      rendrePartout(destinations, de, weekend);
     } catch (e) {
       etat("La recherche a échoué", String(e.message || e), true);
     } finally {
