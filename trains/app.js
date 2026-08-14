@@ -391,13 +391,17 @@
     return td;
   }
 
-  function rendrePartout(destinations, origine, weekend) {
+  function rendrePartout(destinations, origine, weekend, totalBrut) {
     zone.innerHTML = "";
+
+    const masquees = totalBrut - destinations.length;
 
     if (!destinations.length) {
       etat(
         "Aucune destination à 0 € trouvée",
-        weekend
+        masquees > 0
+          ? `${masquees} destination(s) trouvée(s) mais sans retour, masquée(s) — décoche "Masquer les destinations sans retour" pour les voir.`
+          : weekend
           ? "Essaie de décocher \"Idéal week-end\", d'élargir la période, ou de changer de gare de départ."
           : "Essaie d'élargir la période ou de changer de gare de départ."
       );
@@ -408,9 +412,11 @@
     titre.className = "t-h2";
     titre.textContent = `${destinations.length} destination${destinations.length > 1 ? "s" : ""} à 0 € `;
     const petit = document.createElement("small");
-    petit.textContent = weekend
-      ? `depuis ${origine}, départ ven/sam et retour dim/lun — clique une ligne pour le détail`
-      : `depuis ${origine} — clique une ligne pour voir le détail des horaires`;
+    const base = weekend
+      ? `depuis ${origine}, départ ven/sam et retour dim/lun`
+      : `depuis ${origine}`;
+    const suffixeMasquees = masquees > 0 ? `, ${masquees} sans retour masquée(s)` : "";
+    petit.textContent = `${base}${suffixeMasquees} — clique une ligne pour le détail`;
     titre.appendChild(petit);
     zone.appendChild(titre);
 
@@ -491,6 +497,17 @@
     }
   }
 
+  // Résultat brut de la dernière recherche "partout", conservé pour
+  // pouvoir re-filtrer (masquer/montrer les destinations sans retour)
+  // sans re-solliciter l'API à chaque coche.
+  let dernieresDestinations = [];
+  let dernierOrigine = "";
+  let dernierWeekend = false;
+
+  function appliquerFiltreRetour(destinations) {
+    return $("masquerSansRetour").checked ? destinations.filter((d) => d.retour) : destinations;
+  }
+
   async function chercherPartout() {
     if (enCours) return;
     const de = $("garePartout").value.trim();
@@ -508,7 +525,10 @@
 
     try {
       const destinations = await destinationsAllerRetour(de, jours, weekend);
-      rendrePartout(destinations, de, weekend);
+      dernieresDestinations = destinations;
+      dernierOrigine = de;
+      dernierWeekend = weekend;
+      rendrePartout(appliquerFiltreRetour(destinations), de, weekend, destinations.length);
     } catch (e) {
       etat("La recherche a échoué", String(e.message || e), true);
     } finally {
@@ -516,6 +536,16 @@
       $("btn").disabled = false;
     }
   }
+
+  $("masquerSansRetour").addEventListener("change", () => {
+    if (!dernieresDestinations.length) return;
+    rendrePartout(
+      appliquerFiltreRetour(dernieresDestinations),
+      dernierOrigine,
+      dernierWeekend,
+      dernieresDestinations.length
+    );
+  });
 
   /* ==========================================================
      Bascule entre les deux modes (deux boutons en guise d'onglets)
