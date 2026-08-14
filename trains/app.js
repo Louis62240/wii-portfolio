@@ -201,7 +201,12 @@
       const data = await res.json();
       lignes.push(...(data.results || []));
 
-      if (lignes.length >= (data.total_count || 0) || !data.results?.length) break;
+      // Piège de l'API : avec group_by, total_count ne donne pas le vrai
+      // total mais juste la taille de CETTE page (vérifié : 100 puis 56
+      // sur une requête à 156 résultats réels) — s'y fier arrêterait la
+      // pagination bien trop tôt. On continue tant qu'une page pleine
+      // revient, et on s'arrête dès qu'une page plus courte apparaît.
+      if (!data.results || data.results.length < PAR_PAGE) break;
     }
     return lignes;
   }
