@@ -47,6 +47,11 @@
   .w-note{ margin: 0; font-size: 13px; color: var(--k-ink-soft); }
 
   tr.w-hidden{ display: none; }
+
+  /* Cette page a besoin de plus de largeur que le kit n'en donne par
+     défaut : le tableau a beaucoup de colonnes. */
+  .k-header,
+  .k-main{ max-width: 1400px; }
 </style>
 </head>
 <body>
@@ -57,10 +62,7 @@
     <h1 class="k-title">Vols de week-end pas chers</h1>
     <p class="k-lede">
       Départs de <strong>Bruxelles</strong> (BRU + CRL), <strong>Lille</strong> (LIL) et
-      <strong>Paris</strong> (CDG + ORY + BVA), vers n'importe quelle destination.
-      Seuls trois vrais formats de week-end sont retenus : vendredi matin ou
-      vendredi soir vers dimanche soir, et samedi matin vers lundi soir —
-      toujours 2 nuits sur place.
+      <strong>Paris</strong> (CDG + ORY + BVA).
     </p>
   </header>
 
