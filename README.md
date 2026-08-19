@@ -160,7 +160,7 @@ rsync -avz --delete \
 kit/kit.css           l'ADN visuel partage par mes pages (couleurs, typo,
                       composants) -- le menu s'en sert aussi
 kit/index.html        le catalogue des composants (/kit/)
-index.html            structure de la page
+index.html            structure de la page (le menu Wii)
 css/style.css         ce qui est propre au menu : grille, curseur
                       Wiimote, ecran de presentation
 js/projects.js        <- le seul fichier à éditer au quotidien
@@ -172,4 +172,22 @@ assets/avatar.png     mon Mii, affiche dans le bouton rond en bas a gauche
 assets/og-cover.png   1200x630, l'apercu affiche quand on partage le lien
 assets/banners/       les vignettes 4:3, en WebP
 audio/menu.mp3        musique optionnelle
+```
+
+### Les chaînes qui ont leur propre dossier
+
+Chaque projet un peu costaud vit dans son propre dossier a la racine,
+avec son `index.html` (+ un `app.js` s'il a besoin de logique) et son
+lien depuis `js/projects.js`. Toutes reprennent `/kit/kit.css` pour
+rester visuellement cohérentes avec le menu.
+
+```
+trains/       "Trains à 0 €" -- interroge l'open data SNCF (TGVmax) en
+              direct depuis le navigateur, aucun backend
+weekends/     "Vols de week-end pas chers" -- page statique listant un
+              instantané de recherche Azair (script Python à part, pas
+              dans ce repo), pas de recherche live
+open-banking/ pages legales (confidentialite, CGU, callback OAuth) pour
+              une appli mobile personnelle a part -- n'apparait pas dans
+              le menu, hebergees ici uniquement par commodite de deploiement
 ```
