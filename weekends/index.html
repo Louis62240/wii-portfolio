@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vols de week-end pas chers</title>
+<meta name="description" content="Vols de week-end pas chers au départ de Bruxelles, Lille et Paris : vendredi matin ou soir vers dimanche soir, samedi matin vers lundi soir.">
+<meta name="theme-color" content="#23b6ee">
+<link rel="canonical" href="https://louishanquiez.fr/weekends/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Louis Hanquiez">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://louishanquiez.fr/weekends/">
+<meta property="og:title" content="Vols de week-end pas chers">
+<meta property="og:description" content="Vols de week-end pas chers au départ de Bruxelles, Lille et Paris, triés par prix.">
+<meta property="og:image" content="https://louishanquiez.fr/assets/og-cover.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23eef2f4'/><circle cx='16' cy='16' r='8' fill='%2300a8e8'/></svg>">
+<link rel="stylesheet" href="/kit/kit.css">
+<style>
+  /* Le strict nécessaire : tout le reste vient du kit. */
+  .w-bar{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--k-gap);
+    margin-bottom: var(--k-gap);
+  }
+  .w-count{
+    margin-left: auto;
+    align-self: center;
+    font-size: 13px;
+    color: var(--k-ink-soft);
+    white-space: nowrap;
+  }
+  .w-count strong{ color: var(--k-ink-strong); }
+
+  .w-price{ font-weight: 700; color: var(--k-ink-strong); }
+  .w-code{ color: var(--k-ink-soft); font-weight: 400; }
+  .w-dest{ font-weight: 700; }
+
+  .k-chip.w-chip--fri-morning{ color: #2f7a2f; background: #eaf7ea; box-shadow: inset 0 0 0 1px #b6e0b6; }
+  .k-chip.w-chip--fri-evening{ color: #40788e; background: var(--k-blue-pale); box-shadow: inset 0 0 0 1px var(--k-blue-soft); }
+  .k-chip.w-chip--sat-morning{ color: #96601a; background: #fdf3e4; box-shadow: inset 0 0 0 1px #f0d2a3; }
+
+  .w-note{ margin: 0; font-size: 13px; color: var(--k-ink-soft); }
+
+  tr.w-hidden{ display: none; }
+</style>
+</head>
+<body>
+
+<div class="k-screen">
+
+  <header class="k-header">
+    <h1 class="k-title">Vols de week-end pas chers</h1>
+    <p class="k-lede">
+      Départs de <strong>Bruxelles</strong> (BRU + CRL), <strong>Lille</strong> (LIL) et
+      <strong>Paris</strong> (CDG + ORY + BVA), vers n'importe quelle destination.
+      Seuls trois vrais formats de week-end sont retenus : vendredi matin ou
+      vendredi soir vers dimanche soir, et samedi matin vers lundi soir —
+      toujours 2 nuits sur place.
+    </p>
+  </header>
+
+  <main class="k-main">
+
+    <div class="w-bar">
+      <label class="k-field">
+        <span class="k-label">Départ</span>
+        <select class="k-select" id="filtreDepart">
+          <option value="">Tous</option>
+          <option value="Bruxelles">Bruxelles</option>
+          <option value="Lille">Lille</option>
+          <option value="Paris">Paris</option>
+        </select>
+      </label>
+      <label class="k-field">
+        <span class="k-label">Format</span>
+        <select class="k-select" id="filtreFormat">
+          <option value="">Tous</option>
+          <option value="fri-morning">Vendredi matin → Dimanche soir</option>
+          <option value="fri-evening">Vendredi soir → Dimanche soir</option>
+          <option value="sat-morning">Samedi matin → Lundi soir</option>
+        </select>
+      </label>
+      <label class="k-field">
+        <span class="k-label">Prix max</span>
+        <input class="k-input" type="number" id="filtrePrix" placeholder="€" min="0" style="width: 8ch;">
+      </label>
+      <span class="w-count"><strong id="compte">100</strong> vols affichés</span>
+    </div>
+
+    <div class="k-table-wrap">
+      <table class="k-table" id="tableau">
+        <thead>
+          <tr>
+            <th class="k-table__num">Prix</th>
+            <th>Départ</th>
+            <th>Format</th>
+            <th>Destination</th>
+            <th>Aller</th>
+            <th>Retour</th>
+            <th>Compagnie</th>
+          </tr>
+        </thead>
+        <tbody id="corps">
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">37.87&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Wroclaw <span class="w-code">WRO</span></td>
+        <td>Sam 26/09 · 06:55 → 08:40</td>
+        <td>Lun 28/09 · 17:10 → 18:55</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">53.69&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Helsinki <span class="w-code">HEL</span></td>
+        <td>Ven 25/09 · 06:40 → 10:20</td>
+        <td>Dim 27/09 · 21:10 → 22:55</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">56.98&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Venice <span class="w-code">TSF</span></td>
+        <td>Sam 05/09 · 06:15 → 07:50</td>
+        <td>Lun 07/09 · 19:20 → 21:10</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">63.13&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Birmingham <span class="w-code">BHX</span></td>
+        <td>Sam 26/09 · 12:15 → 00:55</td>
+        <td>Lun 28/09 · 20:45 → 22:55</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">63.98&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Genova <span class="w-code">GOA</span></td>
+        <td>Ven 09/10 · 11:45 → 13:20</td>
+        <td>Dim 11/10 · 20:40 → 22:15</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-evening">
+        <td class="k-table__num w-price">65.25&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Liverpool <span class="w-code">LPL</span></td>
+        <td>Ven 20/11 · 21:55 → 22:25</td>
+        <td>Dim 22/11 · 18:40 → 21:10</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">68.57&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Milan <span class="w-code">LIN</span></td>
+        <td>Ven 11/09 · 06:30 → 07:55</td>
+        <td>Dim 13/09 · 21:00 → 22:30</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">70.07&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Milan <span class="w-code">LIN</span></td>
+        <td>Sam 21/11 · 06:40 → 08:15</td>
+        <td>Lun 23/11 · 20:50 → 22:25</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">71.13&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">London <span class="w-code">LTN</span></td>
+        <td>Sam 19/09 · 09:05 → 09:25</td>
+        <td>Lun 21/09 · 19:40 → 22:00</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">78.57&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Venice <span class="w-code">VCE</span></td>
+        <td>Sam 26/09 · 12:45 → 14:25</td>
+        <td>Lun 28/09 · 16:30 → 18:15</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">78.98&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Sofia <span class="w-code">SOF</span></td>
+        <td>Ven 11/09 · 09:55 → 13:40</td>
+        <td>Dim 13/09 · 18:15 → 20:10</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">81.65&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Manchester <span class="w-code">MAN</span></td>
+        <td>Sam 31/10 · 07:25 → 07:50</td>
+        <td>Lun 02/11 · 19:50 → 22:15</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">81.66&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Manchester <span class="w-code">MAN</span></td>
+        <td>Sam 14/11 · 10:40 → 11:10</td>
+        <td>Lun 16/11 · 18:45 → 21:15</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">81.86&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Toulouse <span class="w-code">TLS</span></td>
+        <td>Sam 05/09 · 11:15 → 12:30</td>
+        <td>Lun 07/09 · 20:20 → 21:35</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-evening">
+        <td class="k-table__num w-price">82.05&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Manchester <span class="w-code">MAN</span></td>
+        <td>Ven 06/11 · 19:00 → 19:25</td>
+        <td>Dim 08/11 · 19:40 → 22:05</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">83.80&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Warsaw <span class="w-code">WAW</span></td>
+        <td>Ven 02/10 · 06:30 → 08:30</td>
+        <td>Dim 04/10 · 19:10 → 21:15</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">85.15&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Manchester <span class="w-code">MAN</span></td>
+        <td>Ven 02/10 · 09:25 → 09:55</td>
+        <td>Dim 04/10 · 19:10 → 21:45</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">85.36&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Nice <span class="w-code">NCE</span></td>
+        <td>Sam 05/09 · 06:10 → 07:45</td>
+        <td>Lun 07/09 · 22:15 → 23:55</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">85.57&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Venice <span class="w-code">VCE</span></td>
+        <td>Ven 27/11 · 07:35 → 09:15</td>
+        <td>Dim 29/11 · 20:40 → 22:30</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-evening">
+        <td class="k-table__num w-price">85.84&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Poznan <span class="w-code">POZ</span></td>
+        <td>Ven 23/10 · 17:50 → 19:45</td>
+        <td>Dim 25/10 · 19:50 → 21:50</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">85.98&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Dublin <span class="w-code">DUB</span></td>
+        <td>Ven 06/11 · 09:40 → 10:15</td>
+        <td>Dim 08/11 · 18:55 → 21:30</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">86.16&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Birmingham <span class="w-code">BHX</span></td>
+        <td>Sam 10/10 · 10:45 → 11:05</td>
+        <td>Lun 12/10 · 19:30 → 21:55</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">86.89&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Edinburgh <span class="w-code">EDI</span></td>
+        <td>Sam 14/11 · 07:15 → 08:05</td>
+        <td>Lun 16/11 · 18:35 → 21:30</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">87.20&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Bristol <span class="w-code">BRS</span></td>
+        <td>Ven 02/10 · 10:05 → 10:25</td>
+        <td>Dim 04/10 · 19:35 → 21:55</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">87.30&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Verona <span class="w-code">VRN</span></td>
+        <td>Ven 25/09 · 09:50 → 23:05</td>
+        <td>Dim 27/09 · 21:20 → 23:00</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-evening">
+        <td class="k-table__num w-price">87.42&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Geneva <span class="w-code">GVA</span></td>
+        <td>Ven 20/11 · 20:45 → 21:50</td>
+        <td>Dim 22/11 · 19:30 → 20:40</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">89.07&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Naples <span class="w-code">NAP</span></td>
+        <td>Ven 09/10 · 10:15 → 12:30</td>
+        <td>Dim 11/10 · 20:05 → 22:25</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">89.23&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Manchester <span class="w-code">MAN</span></td>
+        <td>Sam 10/10 · 08:40 → 16:35</td>
+        <td>Lun 12/10 · 19:20 → 21:55</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">89.37&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Tirana <span class="w-code">TIA</span></td>
+        <td>Ven 16/10 · 08:10 → 00:25</td>
+        <td>Dim 18/10 · 18:00 → 20:50</td>
+        <td>Ryanair / Wizz Air</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-evening">
+        <td class="k-table__num w-price">90.11&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Newcastle <span class="w-code">NCL</span></td>
+        <td>Ven 13/11 · 19:25 → 20:05</td>
+        <td>Dim 15/11 · 18:55 → 21:30</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">91.26&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Venice <span class="w-code">TSF</span></td>
+        <td>Sam 05/09 · 08:35 → 21:25</td>
+        <td>Lun 07/09 · 19:20 → 21:10</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">92.36&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Nice <span class="w-code">NCE</span></td>
+        <td>Ven 18/09 · 06:05 → 07:40</td>
+        <td>Dim 20/09 · 21:15 → 22:55</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">96.42&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Dubrovnik <span class="w-code">DBV</span></td>
+        <td>Sam 26/09 · 12:55 → 23:59</td>
+        <td>Lun 28/09 · 16:00 → 18:30</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">97.44&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Birmingham <span class="w-code">BHX</span></td>
+        <td>Ven 04/09 · 11:05 → 11:25</td>
+        <td>Dim 06/09 · 18:55 → 21:20</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">97.98&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Marseille <span class="w-code">MRS</span></td>
+        <td>Sam 31/10 · 09:20 → 11:05</td>
+        <td>Lun 02/11 · 16:50 → 18:35</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">98.60&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Berlin <span class="w-code">BER</span></td>
+        <td>Ven 18/09 · 08:35 → 10:20</td>
+        <td>Dim 20/09 · 21:50 → 23:40</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">98.87&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Poznan <span class="w-code">POZ</span></td>
+        <td>Ven 18/09 · 09:50 → 23:25</td>
+        <td>Dim 20/09 · 18:05 → 19:50</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">99.70&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Krakow <span class="w-code">KRK</span></td>
+        <td>Sam 12/09 · 07:20 → 09:30</td>
+        <td>Lun 14/09 · 21:15 → 23:35</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">99.95&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Barcelona <span class="w-code">REU</span></td>
+        <td>Ven 09/10 · 06:40 → 08:40</td>
+        <td>Dim 11/10 · 20:10 → 22:15</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">102.04&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Rome <span class="w-code">FCO</span></td>
+        <td>Sam 31/10 · 11:00 → 13:10</td>
+        <td>Lun 02/11 · 16:00 → 18:10</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">102.06&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Rome <span class="w-code">FCO</span></td>
+        <td>Sam 12/09 · 11:15 → 00:15</td>
+        <td>Lun 14/09 · 20:20 → 22:25</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">103.73&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Milan <span class="w-code">BGY</span></td>
+        <td>Sam 03/10 · 08:10 → 22:10</td>
+        <td>Lun 05/10 · 16:55 → 22:55</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">104.03&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Krakow <span class="w-code">KRK</span></td>
+        <td>Sam 10/10 · 07:20 → 09:30</td>
+        <td>Lun 12/10 · 17:05 → 22:10</td>
+        <td>easyJet / Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">105.97&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Naples <span class="w-code">NAP</span></td>
+        <td>Sam 26/09 · 10:55 → 21:35</td>
+        <td>Lun 28/09 · 16:55 → 19:25</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">107.50&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Glasgow <span class="w-code">GLA</span></td>
+        <td>Ven 13/11 · 07:00 → 07:50</td>
+        <td>Dim 15/11 · 20:25 → 23:10</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">109.55&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Edinburgh <span class="w-code">EDI</span></td>
+        <td>Ven 04/09 · 07:00 → 07:45</td>
+        <td>Dim 06/09 · 19:30 → 22:25</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">110.06&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Milan <span class="w-code">MXP</span></td>
+        <td>Sam 10/10 · 07:00 → 01:40</td>
+        <td>Lun 12/10 · 20:35 → 22:10</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">112.06&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Palermo <span class="w-code">PMO</span></td>
+        <td>Sam 10/10 · 06:00 → 08:20</td>
+        <td>Lun 12/10 · 16:00 → 21:35</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">112.07&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Venice <span class="w-code">VCE</span></td>
+        <td>Sam 07/11 · 07:00 → 08:45</td>
+        <td>Lun 09/11 · 20:30 → 22:25</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">113.75&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Palermo <span class="w-code">PMO</span></td>
+        <td>Sam 24/10 · 11:35 → 01:05</td>
+        <td>Lun 26/10 · 20:25 → 22:55</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">114.56&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Milan <span class="w-code">MXP</span></td>
+        <td>Sam 10/10 · 06:00 → 15:00</td>
+        <td>Lun 12/10 · 20:00 → 21:35</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">114.64&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Budapest <span class="w-code">BUD</span></td>
+        <td>Ven 04/09 · 07:05 → 09:20</td>
+        <td>Dim 06/09 · 21:20 → 23:40</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">116.55&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Palermo <span class="w-code">PMO</span></td>
+        <td>Sam 10/10 · 08:40 → 12:45</td>
+        <td>Lun 12/10 · 16:00 → 22:10</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">117.36&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Birmingham <span class="w-code">BHX</span></td>
+        <td>Ven 09/10 · 08:35 → 18:40</td>
+        <td>Dim 11/10 · 18:55 → 21:20</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">118.57&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Venice <span class="w-code">VCE</span></td>
+        <td>Sam 26/09 · 07:10 → 20:00</td>
+        <td>Lun 28/09 · 16:30 → 18:15</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">118.67&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Manchester <span class="w-code">MAN</span></td>
+        <td>Ven 13/11 · 08:35 → 19:10</td>
+        <td>Dim 15/11 · 19:50 → 22:20</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">120.88&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Geneva <span class="w-code">GVA</span></td>
+        <td>Ven 11/09 · 06:00 → 20:45</td>
+        <td>Dim 13/09 · 20:10 → 21:15</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">121.26&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Krakow <span class="w-code">KRK</span></td>
+        <td>Sam 19/09 · 09:05 → 22:20</td>
+        <td>Lun 21/09 · 17:05 → 22:10</td>
+        <td>easyJet / Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">122.93&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Bristol <span class="w-code">BRS</span></td>
+        <td>Ven 09/10 · 06:20 → 12:25</td>
+        <td>Dim 11/10 · 19:35 → 21:55</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">123.10&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Naples <span class="w-code">NAP</span></td>
+        <td>Ven 11/09 · 06:00 → 17:25</td>
+        <td>Dim 13/09 · 16:55 → 19:15</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">123.11&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Bratislava <span class="w-code">BTS</span></td>
+        <td>Sam 10/10 · 06:25 → 17:00</td>
+        <td>Lun 12/10 · 19:40 → 21:30</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">123.31&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Nice <span class="w-code">NCE</span></td>
+        <td>Sam 12/09 · 09:05 → 21:35</td>
+        <td>Lun 14/09 · 22:15 → 23:55</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">123.70&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Geneva <span class="w-code">GVA</span></td>
+        <td>Sam 31/10 · 07:00 → 16:10</td>
+        <td>Lun 02/11 · 19:00 → 20:10</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">124.67&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Rome <span class="w-code">FCO</span></td>
+        <td>Sam 10/10 · 09:25 → 23:35</td>
+        <td>Lun 12/10 · 16:15 → 18:30</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">124.96&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Catania <span class="w-code">CTA</span></td>
+        <td>Ven 25/09 · 11:45 → 00:15</td>
+        <td>Dim 27/09 · 17:25 → 23:00</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-evening">
+        <td class="k-table__num w-price">125.94&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Belfast <span class="w-code">BFS</span></td>
+        <td>Ven 11/09 · 22:00 → 22:50</td>
+        <td>Dim 13/09 · 18:00 → 20:50</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">126.35&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Rome <span class="w-code">FCO</span></td>
+        <td>Ven 18/09 · 08:05 → 22:30</td>
+        <td>Dim 20/09 · 20:25 → 22:30</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">127.10&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Ajaccio <span class="w-code">AJA</span></td>
+        <td>Ven 09/10 · 12:30 → 14:20</td>
+        <td>Dim 11/10 · 16:05 → 17:55</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">128.02&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Krakow <span class="w-code">KRK</span></td>
+        <td>Sam 10/10 · 06:55 → 15:05</td>
+        <td>Lun 12/10 · 17:05 → 21:35</td>
+        <td>easyJet / Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">128.19&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Edinburgh <span class="w-code">EDI</span></td>
+        <td>Sam 28/11 · 06:40 → 14:00</td>
+        <td>Lun 30/11 · 18:35 → 21:30</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="sat-morning">
+        <td class="k-table__num w-price">129.26&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Budapest <span class="w-code">BUD</span></td>
+        <td>Sam 19/09 · 08:40 → 23:30</td>
+        <td>Lun 21/09 · 17:40 → 22:10</td>
+        <td>easyJet / Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">130.91&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Knock <span class="w-code">NOC</span></td>
+        <td>Ven 02/10 · 10:05 → 13:25</td>
+        <td>Dim 04/10 · 17:35 → 21:55</td>
+        <td>easyJet / Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-evening">
+        <td class="k-table__num w-price">133.98&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Tirana <span class="w-code">TIA</span></td>
+        <td>Ven 16/10 · 22:20 → 00:50</td>
+        <td>Dim 18/10 · 18:30 → 21:15</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">136.31&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Venice <span class="w-code">VCE</span></td>
+        <td>Ven 13/11 · 09:55 → 14:45</td>
+        <td>Dim 15/11 · 21:25 → 23:15</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">137.48&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Edinburgh <span class="w-code">EDI</span></td>
+        <td>Ven 04/09 · 09:05 → 21:15</td>
+        <td>Dim 06/09 · 19:30 → 22:25</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">138.68&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Tirana <span class="w-code">TIA</span></td>
+        <td>Sam 26/09 · 11:50 → 22:50</td>
+        <td>Lun 28/09 · 18:00 → 20:50</td>
+        <td>Ryanair / Wizz Air</td>
+      </tr>
+      <tr data-depart="Paris" data-format="fri-morning">
+        <td class="k-table__num w-price">145.69&nbsp;€</td>
+        <td>Paris</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Glasgow <span class="w-code">GLA</span></td>
+        <td>Ven 13/11 · 10:00 → 20:15</td>
+        <td>Dim 15/11 · 20:25 → 23:10</td>
+        <td>easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">147.65&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Corfu <span class="w-code">CFU</span></td>
+        <td>Sam 17/10 · 06:55 → 23:25</td>
+        <td>Lun 19/10 · 16:50 → 18:40</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">150.28&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Milan <span class="w-code">MXP</span></td>
+        <td>Sam 07/11 · 07:25 → 12:20</td>
+        <td>Lun 09/11 · 17:15 → 22:15</td>
+        <td>Ryanair / easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">151.30&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Sevilla <span class="w-code">SVQ</span></td>
+        <td>Ven 09/10 · 09:50 → 21:00</td>
+        <td>Dim 11/10 · 18:25 → 21:05</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">151.48&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Rhodes <span class="w-code">RHO</span></td>
+        <td>Sam 19/09 · 08:15 → 12:45</td>
+        <td>Lun 21/09 · 17:45 → 20:35</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">151.98&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Ibiza <span class="w-code">IBZ</span></td>
+        <td>Sam 05/09 · 09:55 → 12:20</td>
+        <td>Lun 07/09 · 16:55 → 19:15</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Lille" data-format="sat-morning">
+        <td class="k-table__num w-price">154.30&nbsp;€</td>
+        <td>Lille</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Faro <span class="w-code">FAO</span></td>
+        <td>Sam 03/10 · 11:50 → 23:30</td>
+        <td>Lun 05/10 · 20:05 → 23:55</td>
+        <td>Volotea</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">157.98&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Brindisi <span class="w-code">BDS</span></td>
+        <td>Ven 16/10 · 07:25 → 09:50</td>
+        <td>Dim 18/10 · 17:05 → 19:35</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-evening">
+        <td class="k-table__num w-price">159.98&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Bucharest <span class="w-code">OTP</span></td>
+        <td>Ven 30/10 · 16:50 → 20:35</td>
+        <td>Dim 01/11 · 21:10 → 22:55</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">161.98&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Palermo <span class="w-code">PMO</span></td>
+        <td>Ven 06/11 · 07:05 → 09:35</td>
+        <td>Dim 08/11 · 18:30 → 21:00</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">175.11&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Tangier <span class="w-code">TNG</span></td>
+        <td>Sam 31/10 · 07:55 → 10:50</td>
+        <td>Lun 02/11 · 19:35 → 22:30</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">179.16&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Rhodes <span class="w-code">RHO</span></td>
+        <td>Sam 05/09 · 09:30 → 17:15</td>
+        <td>Lun 07/09 · 17:45 → 20:35</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Lille" data-format="sat-morning">
+        <td class="k-table__num w-price">180.90&nbsp;€</td>
+        <td>Lille</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Montpellier <span class="w-code">MPL</span></td>
+        <td>Sam 10/10 · 07:00 → 18:35</td>
+        <td>Lun 12/10 · 17:40 → 19:15</td>
+        <td>Volotea</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">182.43&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Zurich <span class="w-code">ZRH</span></td>
+        <td>Ven 06/11 · 11:30 → 19:55</td>
+        <td>Dim 08/11 · 16:45 → 22:05</td>
+        <td>Ryanair / easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">184.05&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Lisbon <span class="w-code">LIS</span></td>
+        <td>Ven 30/10 · 12:30 → 14:20</td>
+        <td>Dim 01/11 · 17:50 → 21:40</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Lille" data-format="sat-morning">
+        <td class="k-table__num w-price">192.33&nbsp;€</td>
+        <td>Lille</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Geneva <span class="w-code">GVA</span></td>
+        <td>Sam 10/10 · 07:00 → 13:25</td>
+        <td>Lun 12/10 · 16:20 → 23:55</td>
+        <td>Volotea / easyJet</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">192.67&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Palermo <span class="w-code">PMO</span></td>
+        <td>Ven 06/11 · 08:05 → 17:40</td>
+        <td>Dim 08/11 · 18:30 → 21:00</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-evening">
+        <td class="k-table__num w-price">197.98&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Malaga <span class="w-code">AGP</span></td>
+        <td>Ven 06/11 · 16:40 → 19:30</td>
+        <td>Dim 08/11 · 20:05 → 22:55</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">214.98&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Palermo <span class="w-code">PMO</span></td>
+        <td>Sam 07/11 · 06:20 → 08:50</td>
+        <td>Lun 09/11 · 20:25 → 22:55</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">219.47&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Ibiza <span class="w-code">IBZ</span></td>
+        <td>Sam 05/09 · 06:25 → 20:10</td>
+        <td>Lun 07/09 · 16:55 → 19:15</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-morning">
+        <td class="k-table__num w-price">235.41&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-morning">Vendredi matin → Dimanche soir</span></td>
+        <td class="w-dest">Thessalonique <span class="w-code">SKG</span></td>
+        <td>Ven 25/09 · 08:10 → 16:10</td>
+        <td>Dim 27/09 · 18:30 → 20:30</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">261.54&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Sevilla <span class="w-code">SVQ</span></td>
+        <td>Sam 31/10 · 09:50 → 12:30</td>
+        <td>Lun 02/11 · 20:05 → 22:45</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="fri-evening">
+        <td class="k-table__num w-price">309.29&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--fri-evening">Vendredi soir → Dimanche soir</span></td>
+        <td class="w-dest">Sevilla <span class="w-code">SVQ</span></td>
+        <td>Ven 30/10 · 16:40 → 19:20</td>
+        <td>Dim 01/11 · 19:40 → 22:20</td>
+        <td>Ryanair</td>
+      </tr>
+      <tr data-depart="Bruxelles" data-format="sat-morning">
+        <td class="k-table__num w-price">537.69&nbsp;€</td>
+        <td>Bruxelles</td>
+        <td><span class="k-chip w-chip--sat-morning">Samedi matin → Lundi soir</span></td>
+        <td class="w-dest">Agadir <span class="w-code">AGA</span></td>
+        <td>Sam 31/10 · 07:55 → 11:45</td>
+        <td>Lun 02/11 · 19:05 → 22:55</td>
+        <td>Ryanair</td>
+      </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="k-state" id="etatVide" style="display:none">
+      <div class="k-state__title">Aucun vol pour ces filtres</div>
+      <p class="w-note">Essaie d'élargir le prix max ou de repasser sur « Tous ».</p>
+    </div>
+
+    <p class="w-note" style="margin-top: var(--k-gap);">
+      Instantané généré le 19/08/2026 pour les vols de septembre à novembre 2026,
+      trié par prix total (aller + retour). Les prix et disponibilités changent en
+      continu sur Azair — à revérifier avant de réserver.
+    </p>
+
+  </main>
+
+  <footer class="k-footer">
+    Vols de week-end — <a href="/">retour au menu</a> ·
+    <a href="https://www.azair.eu/" target="_blank" rel="noopener">source des données</a>
+  </footer>
+
+</div>
+
+<script>
+  var lignes = Array.prototype.slice.call(document.querySelectorAll('#corps tr'));
+  var selDepart = document.getElementById('filtreDepart');
+  var selFormat = document.getElementById('filtreFormat');
+  var inpPrix = document.getElementById('filtrePrix');
+  var compte = document.getElementById('compte');
+  var etatVide = document.getElementById('etatVide');
+  var tableauWrap = document.querySelector('.k-table-wrap');
+
+  function prixDeLigne(tr){
+    return parseFloat(tr.querySelector('.w-price').textContent.replace(',', '.'));
+  }
+
+  function filtrer(){
+    var depart = selDepart.value;
+    var format = selFormat.value;
+    var prixMax = parseFloat(inpPrix.value);
+    var visibles = 0;
+
+    lignes.forEach(function(tr){
+      var ok = true;
+      if (depart && tr.dataset.depart !== depart) ok = false;
+      if (format && tr.dataset.format !== format) ok = false;
+      if (!isNaN(prixMax) && prixDeLigne(tr) > prixMax) ok = false;
+      tr.classList.toggle('w-hidden', !ok);
+      if (ok) visibles++;
+    });
+
+    compte.textContent = visibles;
+    etatVide.style.display = visibles === 0 ? 'flex' : 'none';
+    tableauWrap.style.display = visibles === 0 ? 'none' : 'block';
+  }
+
+  selDepart.addEventListener('change', filtrer);
+  selFormat.addEventListener('change', filtrer);
+  inpPrix.addEventListener('input', filtrer);
+</script>
+
+</body>
+</html>

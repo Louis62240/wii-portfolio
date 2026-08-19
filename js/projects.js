@@ -67,5 +67,21 @@ const PROJECTS = [
       "aucun serveur, aucune base, et des horaires toujours à jour. Un bot " +
       "Discord surveille en parallèle les mêmes données et signale les " +
       "nouveaux trains dès qu'ils apparaissent."
+  },
+  {
+    title: "Vols de week-end pas chers",
+    url: "/weekends/",
+    image: "assets/banners/vols_weekend.webp",
+    color: "#12a6dd",
+    subtitle: "Bruxelles, Lille, Paris",
+    tech: ["Python", "Azair"],
+    description:
+      "Vendredi matin ou soir vers dimanche soir, samedi matin vers lundi " +
+      "soir : les vols de week-end les moins chers au départ de Bruxelles, " +
+      "Lille et Paris, triés par prix.\n\n" +
+      "Instantané généré à la main par un script Python qui interroge Azair " +
+      "en recherche flexible, puis classe chaque résultat matin/soir à " +
+      "partir de l'heure de vol — pas de mise à jour automatique pour le " +
+      "moment."
   }
 ];
